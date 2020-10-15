@@ -27,7 +27,9 @@ hs_err_pid*
 # Other things
 target/*
 .idea/*
+logs/
 *.iml
 dependency-reduced-pom.xml
 application.conf
 config.file
+*.db
