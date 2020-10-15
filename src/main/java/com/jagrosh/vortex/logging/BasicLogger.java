@@ -22,6 +22,8 @@ import com.jagrosh.vortex.utils.LogUtil;
 import com.jagrosh.vortex.utils.Usage;
 import com.typesafe.config.Config;
 import java.awt.Color;
+import java.io.IOException;
+import java.net.URL;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -40,6 +42,7 @@ import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.core.events.user.update.UserUpdateDiscriminatorEvent;
 import net.dv8tion.jda.core.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.core.exceptions.PermissionException;
+import net.dv8tion.jda.core.requests.restaction.MessageAction;
 
 /**
  *
@@ -100,6 +103,43 @@ public class BasicLogger
         }
         catch(PermissionException ignore) {}
     }
+
+    private MessageEmbed.Field reuploadAttachments(CachedMessage message)
+    {
+        TextChannel reuploader = vortex.getJDA().getTextChannelById(766330310471319602L);
+        if(reuploader == null)
+            return null;
+
+        MessageAction action = null;
+
+        for(Message.Attachment attachment : message.getAttachments())
+        {
+            if(attachment.getSize() > ((SelfUser) reuploader.getGuild().getSelfMember().getUser()).getAllowedFileSize())
+                reuploader = vortex.getJDA().getTextChannelById(742484985159745558L);
+
+            try
+            {
+                if(action == null)
+                    action = reuploader.sendFile(new URL(attachment.getProxyUrl()).openStream(), attachment.getFileName());
+                else
+                    action = action.addFile(new URL(attachment.getProxyUrl()).openStream(), attachment.getFileName());
+            }
+            catch(IOException ignored) {}
+        }
+
+        if(action == null)
+            return null;
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for(Message.Attachment reuploaded : action.complete().getAttachments())
+        {
+            stringBuilder.append(":paperclip: [").append(reuploaded.getFileName()).append("](")
+                    .append(reuploaded.getUrl()).append(")\n");
+        }
+
+        return new MessageEmbed.Field("Reuploaded Attachments:", stringBuilder.toString(), false);
+    }
     
     // Message Logs
     
@@ -148,12 +188,13 @@ public class BasicLogger
             return;
         EmbedBuilder delete = new EmbedBuilder()
                 .setColor(Color.RED)
-                .appendDescription(formatted);
+                .appendDescription(formatted)
+                .addField(reuploadAttachments(oldMessage));
         User author = oldMessage.getAuthor(vortex.getJDA());
         String user = author==null ? FormatUtil.formatCachedMessageFullUser(oldMessage) : FormatUtil.formatFullUser(author);
         log(OffsetDateTime.now(), tc, DELETE, user+"'s message has been deleted from "+mtc.getAsMention()+":", delete.build());
     }
-    
+
     public void logMessageBulkDelete(List<CachedMessage> messages, int count, TextChannel text)
     {
         if(count==0)
