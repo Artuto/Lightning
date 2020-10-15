@@ -108,10 +108,10 @@ public class LookupCmd extends Command
     
     private boolean lookupUser(long userId, CommandEvent event)
     {
-        User u = vortex.getShardManager().getUserById(userId);
+        User u = vortex.getJDA().getUserById(userId);
         if(u==null) try
         {
-            u = vortex.getShardManager().retrieveUserById(userId).complete(false);
+            u = vortex.getJDA().retrieveUserById(userId).complete(false);
         }
         catch(RateLimitedException ratelimited)
         {

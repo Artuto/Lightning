@@ -53,7 +53,7 @@ public class TransferCmd extends Command
             list.stream().map(str -> str.split(" ")).forEach(split -> oldSettings.put(Long.parseLong(split[0]), split));
             int mcount = 0;
             int count = 0;
-            for(Guild g: vortex.getShardManager().getGuilds())
+            for(Guild g: vortex.getJDA().getGuilds())
             {
                 if(!oldSettings.containsKey(g.getIdLong()))
                     continue;

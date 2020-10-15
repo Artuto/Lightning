@@ -15,8 +15,8 @@
  */
 package com.jagrosh.vortex.automod;
 
+import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.utils.FixedCache;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Invite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +27,13 @@ import org.slf4j.LoggerFactory;
  */
 public class InviteResolver
 {
-    private final JDA altBot;
+    private final Vortex bot;
     private final Logger log = LoggerFactory.getLogger(InviteResolver.class);
     private final FixedCache<String,Long> cached = new FixedCache<>(5000);
     
-    public InviteResolver(JDA altBot)
+    public InviteResolver(Vortex bot)
     {
-        this.altBot = altBot;
+        this.bot = bot;
     }
     
     public long resolve(String code)
@@ -43,7 +43,7 @@ public class InviteResolver
             return cached.get(code);
         try
         {
-            Invite i = Invite.resolve(altBot, code).complete(false);
+            Invite i = Invite.resolve(bot.getJDA(), code).complete(false);
             cached.put(code, i.getGuild().getIdLong());
             return i.getGuild().getIdLong();
         }

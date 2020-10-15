@@ -95,7 +95,7 @@ public class StrikeCmd extends ModCommand
         List<Long> unknownIds = new LinkedList<>();
         args.ids.forEach(id -> 
         {
-            User u = vortex.getShardManager().getUserById(id);
+            User u = vortex.getJDA().getUserById(id);
             if(u==null)
                 unknownIds.add(id);
             else

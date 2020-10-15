@@ -107,7 +107,7 @@ public class BasicLogger
     {
         if(oldMessage==null)
             return;
-        TextChannel mtc = oldMessage.getTextChannel(vortex.getShardManager());
+        TextChannel mtc = oldMessage.getTextChannel(vortex.getJDA());
         PermissionOverride po = mtc.getPermissionOverride(mtc.getGuild().getSelfMember());
         if(po!=null && po.getDenied().contains(Permission.MESSAGE_HISTORY))
             return;
@@ -133,10 +133,10 @@ public class BasicLogger
     {
         if(oldMessage==null)
             return;
-        Guild guild = oldMessage.getGuild(vortex.getShardManager());
+        Guild guild = oldMessage.getGuild(vortex.getJDA());
         if(guild==null)
             return;
-        TextChannel mtc = oldMessage.getTextChannel(vortex.getShardManager());
+        TextChannel mtc = oldMessage.getTextChannel(vortex.getJDA());
         PermissionOverride po = mtc.getPermissionOverride(guild.getSelfMember());
         if(po!=null && po.getDenied().contains(Permission.MESSAGE_HISTORY))
             return;
@@ -149,7 +149,7 @@ public class BasicLogger
         EmbedBuilder delete = new EmbedBuilder()
                 .setColor(Color.RED)
                 .appendDescription(formatted);
-        User author = oldMessage.getAuthor(vortex.getShardManager());
+        User author = oldMessage.getAuthor(vortex.getJDA());
         String user = author==null ? FormatUtil.formatCachedMessageFullUser(oldMessage) : FormatUtil.formatFullUser(author);
         log(OffsetDateTime.now(), tc, DELETE, user+"'s message has been deleted from "+mtc.getAsMention()+":", delete.build());
     }
@@ -166,7 +166,7 @@ public class BasicLogger
             //log(OffsetDateTime.now(), tc, "\uD83D\uDEAE", "**"+count+"** messages were deleted from "+text.getAsMention()+" (**"+messages.size()+"** logged)", null);
             return;
         }
-        TextChannel mtc = messages.get(0).getTextChannel(vortex.getShardManager());
+        TextChannel mtc = messages.get(0).getTextChannel(vortex.getJDA());
         PermissionOverride po = mtc.getPermissionOverride(mtc.getGuild().getSelfMember());
         if(po!=null && po.getDenied().contains(Permission.MESSAGE_HISTORY))
             return;
@@ -178,12 +178,12 @@ public class BasicLogger
             EmbedBuilder delete = new EmbedBuilder()
                     .setColor(Color.RED)
                     .appendDescription(formatted);
-            User author = messages.get(0).getAuthor(vortex.getShardManager());
+            User author = messages.get(0).getAuthor(vortex.getJDA());
             String user = author==null ? FormatUtil.formatCachedMessageFullUser(messages.get(0)) : FormatUtil.formatFullUser(author);
             log(OffsetDateTime.now(), tc, DELETE, user+"'s message has been deleted from "+mtc.getAsMention()+":", delete.build());
             return;
         }
-        vortex.getTextUploader().upload(LogUtil.logCachedMessagesForwards("Deleted Messages", messages, vortex.getShardManager()), "DeletedMessages", (view, download) ->
+        vortex.getTextUploader().upload(LogUtil.logCachedMessagesForwards("Deleted Messages", messages, vortex.getJDA()), "DeletedMessages", (view, download) ->
         {
             log(OffsetDateTime.now(), tc, BULK_DELETE, "**"+count+"** messages were deleted from "+text.getAsMention()+" (**"+messages.size()+"** logged):", 
                 new EmbedBuilder().setColor(Color.RED.darker().darker())

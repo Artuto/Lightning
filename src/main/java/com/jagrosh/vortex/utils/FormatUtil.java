@@ -294,7 +294,7 @@ public class FormatUtil {
                     "[**"+cmd.getHelp()+"**]("+Constants.Wiki.COMMANDS+"#-"+(cmd.getCategory()==null?"general":cmd.getCategory().getName().toLowerCase())+"-commands)\n\u200B", false));
         }
         
-        builder.addField("Additional Help", helpLinks(event), false);
+        //builder.addField("Additional Help", helpLinks(event), false);
         
         return new MessageBuilder().append(filterEveryone(content)).setEmbed(builder.build()).build();
     }

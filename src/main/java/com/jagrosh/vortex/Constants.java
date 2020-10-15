@@ -25,10 +25,10 @@ import net.dv8tion.jda.core.Permission;
 public class Constants
 {
     public final static OffsetDateTime STARTUP = OffsetDateTime.now();
-    public final static String PREFIX          = ">>";
-    public final static String SUCCESS         = "<:vSuccess:390202497827864597>";
-    public final static String WARNING         = "<:vWarning:390208158699618306>";
-    public final static String ERROR           = "<:vError:390229421228949504>";
+    public final static String PREFIX          = ">>>";
+    public final static String SUCCESS         = "✅";
+    public final static String WARNING         = "⚠";
+    public final static String ERROR           = "❌";
     public final static String LOADING         = "<a:typing:393848431413559296>";
     public final static String HELP_REACTION   = SUCCESS.replaceAll("<a?:(.+):(\\d+)>", "$1:$2");
     public final static String ERROR_REACTION  = ERROR.replaceAll("<a?:(.+):(\\d+)>", "$1:$2");
@@ -39,10 +39,10 @@ public class Constants
                                         Permission.MESSAGE_WRITE,Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_HISTORY, Permission.MESSAGE_EXT_EMOJI,
                                         Permission.MESSAGE_MANAGE, Permission.VOICE_CONNECT, Permission.VOICE_MOVE_OTHERS, Permission.VOICE_DEAF_OTHERS, 
                                         Permission.VOICE_MUTE_OTHERS, Permission.NICKNAME_CHANGE, Permission.NICKNAME_MANAGE, Permission.VIEW_AUDIT_LOGS};
-    public final static String SERVER_INVITE = "https://discord.gg/0p9LSGoRLu6Pet0k";
+    //public final static String SERVER_INVITE = "https://discord.gg/0p9LSGoRLu6Pet0k";
     //public final static String BOT_INVITE  = "https://discordapp.com/oauth2/authorize?client_id=240254129333731328&scope=bot&permissions="+Permission.getRaw(PERMISSIONS);
     // public final static String BOT_INVITE    = "https://discordapp.com/oauth2/authorize?client_id=169463754382114816&scope=bot&permissions="+Permission.getRaw(PERMISSIONS);
-    public final static String OWNER_ID      = "113156185389092864";
+    public final static String OWNER_ID      = "264499432538505217";
     public final static String DONATION_LINK = "https://patreon.com/jagrosh";
     
     public final static class Wiki

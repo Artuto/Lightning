@@ -61,7 +61,7 @@ public class PremiumCmd extends Command
         Guild guild;
         try
         {
-            guild = vortex.getShardManager().getGuildById(Long.parseLong(parts[0]));
+            guild = vortex.getJDA().getGuildById(Long.parseLong(parts[0]));
         }
         catch(NumberFormatException ex)
         {

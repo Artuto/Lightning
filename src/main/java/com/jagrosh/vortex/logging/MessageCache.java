@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.bot.sharding.ShardManager;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.entities.Message.Attachment;
 
@@ -83,9 +84,9 @@ public class MessageCache
             return attachments;
         }
         
-        public User getAuthor(ShardManager shardManager)
+        public User getAuthor(JDA jda)
         {
-            return shardManager.getUserById(author);
+            return jda.getUserById(author);
         }
         
         public String getUsername()
@@ -103,11 +104,11 @@ public class MessageCache
             return author;
         }
         
-        public TextChannel getTextChannel(ShardManager shardManager)
+        public TextChannel getTextChannel(JDA jda)
         {
             if (guild == 0L)
                 return null;
-            Guild g = shardManager.getGuildById(guild);
+            Guild g = jda.getGuildById(guild);
             if (g == null)
                 return null;
             return g.getTextChannelById(channel);
@@ -123,11 +124,11 @@ public class MessageCache
             return guild.getTextChannelById(channel);
         }
         
-        public Guild getGuild(ShardManager shardManager)
+        public Guild getGuild(JDA jda)
         {
             if (guild == 0L)
                 return null;
-            return shardManager.getGuildById(guild);
+            return jda.getGuildById(guild);
         }
 
         @Override

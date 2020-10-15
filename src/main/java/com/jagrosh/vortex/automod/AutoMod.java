@@ -75,10 +75,10 @@ public class AutoMod
     private final HashMap<Long,OffsetDateTime> latestGuildJoin = new HashMap<>();
     private final Usage usage = new Usage();
     
-    public AutoMod(Vortex vortex, JDA altBot, Config config)
+    public AutoMod(Vortex bot, Config config)
     {
-        this.vortex = vortex;
-        this.inviteResolver = new InviteResolver(altBot);
+        this.vortex = bot;
+        this.inviteResolver = new InviteResolver(bot);
         this.urlResolver = config.getBoolean("url-resolver.active") ? new ActiveURLResolver(config) : new DummyURLResolver();
         loadCopypastas();
         loadReferralDomains();

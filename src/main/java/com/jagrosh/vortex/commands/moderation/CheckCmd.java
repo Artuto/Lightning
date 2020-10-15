@@ -68,7 +68,7 @@ public class CheckCmd extends ModCommand
         try
         {
             Long uid = Long.parseLong(event.getArgs());
-            User u = vortex.getShardManager().getUserById(uid);
+            User u = vortex.getJDA().getUserById(uid);
             if(u!=null)
                 check(event, u);
             else

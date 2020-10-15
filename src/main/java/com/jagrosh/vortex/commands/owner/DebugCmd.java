@@ -49,15 +49,15 @@ public class DebugCmd extends Command
         long usedMb = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/(1024*1024);
         StringBuilder sb = new StringBuilder("**"+event.getSelfUser().getName()+"** statistics:"
                 + "\nLast Startup: "+FormatUtil.secondsToTime(Constants.STARTUP.until(OffsetDateTime.now(), ChronoUnit.SECONDS))+" ago"
-                + "\nGuilds: **"+vortex.getShardManager().getGuildCache().size()+"**"
+                + "\nGuilds: **"+vortex.getJDA().getGuildCache().size()+"**"
                 + "\nMemory: **"+usedMb+"**Mb / **"+totalMb+"**Mb"
-                + "\nAverage Ping: **"+vortex.getShardManager().getAveragePing()+"**ms"
-                + "\nShard Total: **"+vortex.getShardManager().getShardsTotal()+"**"
+                + "\nPing: **"+vortex.getJDA().getPing()+"**ms"
+                /*+ "\nShard Total: **"+vortex.getJDA().getShardsTotal()+"**"
                 + "\nShard Connectivity: ```diff");
-        vortex.getShardManager().getShards().forEach(jda -> sb.append("\n").append(jda.getStatus()==JDA.Status.CONNECTED ? "+ " : "- ")
+        vortex.getJDA().getShards().forEach(jda -> sb.append("\n").append(jda.getStatus()==JDA.Status.CONNECTED ? "+ " : "- ")
                 .append(jda.getShardInfo().getShardId()<10 ? "0" : "").append(jda.getShardInfo().getShardId()).append(": ").append(jda.getStatus())
                 .append(" ~ ").append(jda.getGuildCache().size()).append(" guilds"));
-        sb.append("\n```");
+        sb.append("\n```"*/);
         event.reply(sb.toString().trim());
     }
 }

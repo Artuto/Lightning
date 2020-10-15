@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.bot.sharding.ShardManager;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -132,16 +133,16 @@ public class LogUtil
         return sb.toString().trim();
     }
     
-    public static String logCachedMessagesForwards(String title, List<CachedMessage> messages, ShardManager shardManager)
+    public static String logCachedMessagesForwards(String title, List<CachedMessage> messages, JDA jda)
     {
-        TextChannel deltc = messages.get(0).getTextChannel(shardManager);
+        TextChannel deltc = messages.get(0).getTextChannel(jda);
         Guild delg = deltc.getGuild();
         StringBuilder sb = new StringBuilder("-- "+title+" -- #"+deltc.getName()+" ("+deltc.getId()+") -- "+delg.getName()+" ("+delg.getId()+") --");
         CachedMessage m;
         for(int i=0; i<messages.size(); i++)
         {
             m = messages.get(i);
-            User author = m.getAuthor(shardManager);
+            User author = m.getAuthor(jda);
             sb.append("\r\n\r\n[")
                 .append(m.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
                 .append("] ");

@@ -15,9 +15,10 @@
  */
 package com.jagrosh.vortex.logging;
 
-import com.jagrosh.vortex.Vortex;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import com.jagrosh.vortex.Vortex;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Category;
 import net.dv8tion.jda.core.entities.Guild;
@@ -38,21 +39,21 @@ public class TextUploader
      * message logs. 
      */
     private final Logger LOG = LoggerFactory.getLogger("Upload");
-    private final JDA altBot;
+    private final Vortex bot;
     private final long categoryId;
     private final long guildId;
     private int index = 0;
     
-    public TextUploader(JDA altBot, long guildId, long categoryId)
+    public TextUploader(Vortex bot, long guildId, long categoryId)
     {
-        this.altBot = altBot;
+        this.bot = bot;
         this.guildId = guildId;
         this.categoryId = categoryId;
     }
     
     public void upload(String content, String filename, Result done)
     {
-        Guild guild = altBot.getGuildById(guildId);
+        Guild guild = bot.getJDA().getGuildById(guildId);
         if(guild==null)
             return;
         Category category = guild.getCategoryById(categoryId);
