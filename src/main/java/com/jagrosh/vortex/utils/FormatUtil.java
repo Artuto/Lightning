@@ -294,7 +294,8 @@ public class FormatUtil {
                     "[**"+cmd.getHelp()+"**]("+Constants.Wiki.COMMANDS+"#-"+(cmd.getCategory()==null?"general":cmd.getCategory().getName().toLowerCase())+"-commands)\n\u200B", false));
         }
         
-        //builder.addField("Additional Help", helpLinks(event), false);
+        builder.addField("Important :warning:", "This is not the official Vortex instance, please" +
+                " do not seek support for this bot in the official support guild!", false);
         
         return new MessageBuilder().append(filterEveryone(content)).setEmbed(builder.build()).build();
     }
