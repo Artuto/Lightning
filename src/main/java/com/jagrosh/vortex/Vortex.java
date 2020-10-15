@@ -165,6 +165,7 @@ public class Vortex
                             // Owner
                             new EvalCmd(this),
                             new DebugCmd(this),
+                            new ImportCmd(this),
                             new PremiumCmd(this),
                             new ReloadCmd(this)
                             //new TransferCmd(this)

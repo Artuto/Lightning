@@ -120,6 +120,22 @@ public class GuildSettingsDataManager extends DataManager implements GuildSettin
                 .put("timezone", settings.timezone)
                 .put("voicelog", settings.voicelog);
     }
+
+    public void setSettingsJson(Guild guild, JSONObject json)
+    {
+        setAvatarLogChannel(guild, guild.getTextChannelById(json.getLong("avatarlog")));
+        setMessageLogChannel(guild, guild.getTextChannelById(json.getLong("messagelog")));
+        setModeratorRole(guild, guild.getRoleById(json.getLong("modRole")));
+        setModLogChannel(guild, guild.getTextChannelById(json.getLong("modlog")));
+        // No need to import mute role
+        if(json.has("prefix"))
+            setPrefix(guild, json.getString("prefix"));
+        if(json.getInt("raidMode") != -2)
+            enableRaidMode(guild);
+        setServerLogChannel(guild, guild.getTextChannelById(json.getLong("serverlog")));
+        setTimezone(guild, ZoneId.of(json.getString("timezone")));
+        setVoiceLogChannel(guild, guild.getTextChannelById(json.getLong("voicelog")));
+    }
     
     public boolean hasSettings(Guild guild)
     {

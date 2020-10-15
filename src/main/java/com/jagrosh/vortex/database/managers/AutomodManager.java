@@ -132,6 +132,25 @@ public class AutomodManager extends DataManager
                 .put("refStrikes", settings.refStrikes)
                 .put("resolveUrls", settings.resolveUrls);
     }
+
+    public void setSettingsJson(Guild guild, JSONObject json)
+    {
+        setCopypastaStrikes(guild, json.getInt("copypastaStrikes"));
+        setDehoistChar(guild, json.getString("dehoistChar").charAt(0));
+        setDupeSettings(guild,
+                json.getInt("dupeStrikes"),
+                json.getInt("dupeDeleteThresh"),
+                json.getInt("dupeStrikeThresh")
+        );
+        setEveryoneStrikes(guild, json.getInt("everyoneStrikes"));
+        setInviteStrikes(guild, json.getInt("inviteStrikes"));
+        setMaxLines(guild, json.getInt("maxLines"));
+        setMaxMentions(guild, json.getInt("maxMentions"));
+        setMaxRoleMentions(guild, json.getInt("maxRoleMentions"));
+        setAutoRaidMode(guild, json.getInt("raidmodeNumber"), json.getInt("raidmodeTime"));
+        setRefStrikes(guild, json.getInt("refStrikes"));
+        setResolveUrls(guild, json.getBoolean("resolveUrls"));
+    }
     
     public boolean hasSettings(Guild guild)
     {

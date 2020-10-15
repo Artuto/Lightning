@@ -53,16 +53,22 @@ public class TempBanManager extends DataManager
     
     public JSONObject getAllBansJson(Guild guild)
     {
-        List<Pair<Long,Instant>> list = read(selectAll(GUILD_ID.is(guild.getId())), rs -> 
-        {
-            List<Pair<Long,Instant>> arr = new ArrayList<>();
-            while(rs.next())
-                arr.add(new Pair<>(USER_ID.getValue(rs), FINISH.getValue(rs)));
-            return arr;
-        });
+        List<Pair<Long,Instant>> list = getAllBans(guild);
         JSONObject json = new JSONObject();
         list.forEach(p -> json.put(Long.toString(p.getKey()), p.getValue().getEpochSecond()));
         return json;
+    }
+
+    public void setAllBansJson(Guild guild, JSONObject json)
+    {
+        // remove all current bans first
+        getAllBans(guild).forEach(ban -> clearBan(guild, ban.getKey()));
+
+        json.keySet().forEach(userId ->
+                setBan(guild,
+                        Long.parseLong(userId),
+                        Instant.ofEpochSecond(json.getLong(userId)))
+        );
     }
     
     public void setBan(Guild guild, long userId, Instant finish)
@@ -82,6 +88,22 @@ public class TempBanManager extends DataManager
                 FINISH.updateValue(rs, finish);
                 rs.insertRow();
             }
+        });
+    }
+
+    public List<Pair<Long, Instant>> getAllBans(Guild guild)
+    {
+        return getAllBans(guild.getIdLong());
+    }
+
+    public List<Pair<Long, Instant>> getAllBans(long guildId)
+    {
+        return read(selectAll(GUILD_ID.is(guildId)), rs ->
+        {
+            List<Pair<Long,Instant>> arr = new ArrayList<>();
+            while(rs.next())
+                arr.add(new Pair<>(USER_ID.getValue(rs), FINISH.getValue(rs)));
+            return arr;
         });
     }
     

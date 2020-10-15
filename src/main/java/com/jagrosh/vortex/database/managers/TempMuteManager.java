@@ -55,16 +55,22 @@ public class TempMuteManager extends DataManager
     
     public JSONObject getAllMutesJson(Guild guild)
     {
-        List<Pair<Long,Instant>> list = read(selectAll(GUILD_ID.is(guild.getId())), rs -> 
-        {
-            List<Pair<Long,Instant>> arr = new ArrayList<>();
-            while(rs.next())
-                arr.add(new Pair<>(USER_ID.getValue(rs), FINISH.getValue(rs)));
-            return arr;
-        });
+        List<Pair<Long,Instant>> list = getAllMutes(guild);
         JSONObject json = new JSONObject();
         list.forEach(p -> json.put(Long.toString(p.getKey()), p.getValue().getEpochSecond()));
         return json;
+    }
+
+    public void setAllMutesJson(Guild guild, JSONObject json)
+    {
+        // remove all current mutes first
+        getAllMutes(guild).forEach(mute -> removeMute(guild, mute.getKey()));
+
+        json.keySet().forEach(userId ->
+                setMute(guild,
+                        Long.parseLong(userId),
+                        Instant.ofEpochSecond(json.getLong(userId)))
+        );
     }
     
     public boolean isMuted(Member member)
@@ -93,6 +99,22 @@ public class TempMuteManager extends DataManager
                 FINISH.updateValue(rs, finish);
                 rs.insertRow();
             }
+        });
+    }
+
+    public List<Pair<Long,Instant>> getAllMutes(Guild guild)
+    {
+        return getAllMutes(guild.getIdLong());
+    }
+
+    public List<Pair<Long,Instant>> getAllMutes(long guildId)
+    {
+        return read(selectAll(GUILD_ID.is(guildId)), rs ->
+        {
+            List<Pair<Long,Instant>> arr = new ArrayList<>();
+            while(rs.next())
+                arr.add(new Pair<>(USER_ID.getValue(rs), FINISH.getValue(rs)));
+            return arr;
         });
     }
     

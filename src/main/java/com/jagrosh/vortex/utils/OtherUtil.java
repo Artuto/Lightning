@@ -15,13 +15,16 @@
  */
 package com.jagrosh.vortex.utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,5 +126,20 @@ public class OtherUtil
             LOG.error("Failed to read '"+filename+"':"+ ex);
             return new String[0];
         }
+    }
+
+    public static ByteArrayOutputStream downloadAttachment(Message.Attachment attachment) throws IOException
+    {
+        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+        attachment.withInputStream(inputStream -> {
+            while(true)
+            {
+                int result = inputStream.read();
+                if (result == -1) break;
+                byteArray.write(result);
+            }
+        });
+
+        return byteArray;
     }
 }

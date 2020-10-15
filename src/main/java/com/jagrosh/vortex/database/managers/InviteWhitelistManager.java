@@ -141,6 +141,14 @@ public class InviteWhitelistManager extends DataManager
         return arr;
     }
 
+    public void setWhiteListJson(Guild guild, JSONArray json)
+    {
+        // remove all entries on whitelist first
+        removeAllFromWhitelist(guild, readWhitelist(guild));
+
+        addAllToWhitelist(guild, json.toList().stream().map(x -> (long) x).collect(Collectors.toList()));
+    }
+
     private void invalidateCache(Guild guild)
     {
         cache.pull(guild.getIdLong());

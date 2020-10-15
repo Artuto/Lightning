@@ -99,6 +99,21 @@ public class FilterManager extends DataManager
         filters.forEach(f -> obj.put(f.name, new JSONObject().put("strikes",f.strikes).put("content", f.printContent())));
         return obj;
     }
+
+    public void setFiltersJson(Guild guild, JSONObject json)
+    {
+        // remove all filters first
+        deleteAllFilters(guild.getIdLong());
+
+        json.keySet().forEach(name -> {
+            JSONObject filterJson = json.getJSONObject(name);
+            addFilter(guild,
+                    Filter.parseFilter(name,
+                            filterJson.getInt("strikes"),
+                            filterJson.getString("content"))
+            );
+        });
+    }
     
     public boolean addFilter(Guild guild, Filter filter)
     {

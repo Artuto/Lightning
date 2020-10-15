@@ -54,6 +54,23 @@ public class IgnoreManager extends DataManager
         getIgnores(guild).forEach(id -> array.put(id));
         return array;
     }
+
+    public void setIgnoresJson(Guild guild, JSONArray json)
+    {
+        // delete/unignore all ignored channels & roles first
+        getIgnoredChannels(guild).forEach(channel -> unignore(channel));
+        getIgnoredRoles(guild).forEach(role -> unignore(role));
+
+        json.forEach(id -> {
+            TextChannel channel = guild.getTextChannelById((long) id);
+            Role role = guild.getRoleById((long) id);
+
+            if(channel != null)
+                ignore(channel);
+            else if(role != null)
+                ignore(role);
+        });
+    }
     
     public boolean isIgnored(TextChannel tc)
     {
