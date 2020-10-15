@@ -25,7 +25,7 @@ import net.dv8tion.jda.core.Permission;
 public class Constants
 {
     public final static OffsetDateTime STARTUP = OffsetDateTime.now();
-    public final static String PREFIX          = ">>>";
+    public final static String PREFIX          = System.getProperty("vortiix.prefix", ">>");
     public final static String SUCCESS         = "✅";
     public final static String WARNING         = "⚠";
     public final static String ERROR           = "❌";
