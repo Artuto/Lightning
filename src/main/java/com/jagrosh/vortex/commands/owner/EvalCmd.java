@@ -15,11 +15,12 @@
  */
 package com.jagrosh.vortex.commands.owner;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.Vortex;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 /**
  *
@@ -33,7 +34,7 @@ public class EvalCmd extends Command
     {
         this.vortex = vortex;
         this.name = "eval";
-        this.help = "evaluates nashorn code";
+        this.help = "evaluates rhino code";
         this.ownerCommand = true;
         this.guildOnly = false;
         this.hidden = true;
@@ -45,13 +46,14 @@ public class EvalCmd extends Command
         event.getChannel().sendTyping().queue();
         event.async(() ->
         {
-            ScriptEngine se = new ScriptEngineManager().getEngineByName("Nashorn");
+            ScriptEngine se = new ScriptEngineManager().getEngineByName("rhino");
             se.put("bot", vortex);
             se.put("event", event);
             se.put("jda", event.getJDA());
             se.put("guild", event.getGuild());
             se.put("channel", event.getChannel());
             String args = event.getArgs().replaceAll("([^(]+?)\\s*->", "function($1)");
+
             try
             {
                 event.replySuccess("Evaluated Successfully:\n```\n"+se.eval(args)+" ```");
