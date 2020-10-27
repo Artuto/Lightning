@@ -18,12 +18,13 @@ package com.jagrosh.vortex.commands.owner;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.Vortex;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 /**
  *
@@ -74,7 +75,7 @@ public class TransferCmd extends Command
                     vortex.getDatabase().settings.setModLogChannel(g, modlog);
                     mcount++;
                 }
-                if(maxmentions<7 && autoraid==false && spamLimit<=3 && inviteStrikes==0)
+                if(maxmentions<7 && !autoraid && spamLimit<=3 && inviteStrikes==0)
                     continue;
                 if(vortex.getDatabase().actions.useDefaultSettings(g))
                 {

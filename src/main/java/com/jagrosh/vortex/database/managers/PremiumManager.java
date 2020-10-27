@@ -18,8 +18,13 @@ package com.jagrosh.vortex.database.managers;
 import com.jagrosh.easysql.DataManager;
 import com.jagrosh.easysql.DatabaseConnector;
 import com.jagrosh.easysql.SQLColumn;
-import com.jagrosh.easysql.columns.*;
+import com.jagrosh.easysql.columns.InstantColumn;
+import com.jagrosh.easysql.columns.IntegerColumn;
+import com.jagrosh.easysql.columns.LongColumn;
 import com.jagrosh.vortex.Constants;
+import net.dv8tion.jda.api.entities.Guild;
+import org.json.JSONObject;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -29,8 +34,6 @@ import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import net.dv8tion.jda.api.entities.Guild;
-import org.json.JSONObject;
 
 /**
  *
@@ -151,7 +154,7 @@ public class PremiumManager extends DataManager
         });
     }
     
-    public static enum Level
+    public enum Level
     {
         NONE("No Premium"),
         PLUS("Vortex Plus"),
@@ -160,7 +163,7 @@ public class PremiumManager extends DataManager
         
         public final String name;
         
-        private Level(String name)
+        Level(String name)
         {
             this.name = name;
         }
@@ -176,7 +179,7 @@ public class PremiumManager extends DataManager
         }
     }
     
-    public class PremiumInfo
+    public static class PremiumInfo
     {
         public final Level level;
         public final Instant until;

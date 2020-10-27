@@ -7,6 +7,7 @@ import com.jagrosh.easysql.columns.LongColumn;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.utils.FixedCache;
 import net.dv8tion.jda.api.entities.Guild;
+import org.json.JSONArray;
 import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.json.JSONArray;
 
 public class InviteWhitelistManager extends DataManager
 {
@@ -137,7 +137,7 @@ public class InviteWhitelistManager extends DataManager
     {
         List<Long> list = readWhitelist(guild);
         JSONArray arr = new JSONArray();
-        list.forEach(id -> arr.put(id));
+        list.forEach(arr::put);
         return arr;
     }
 

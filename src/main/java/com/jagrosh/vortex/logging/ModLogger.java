@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -91,7 +92,7 @@ public class ModLogger
                     for(long gid: toUpdate)
                     {
                         time = System.currentTimeMillis();
-                        update(vortex.getJDA().getGuildById(gid), 40);
+                        update(vortex.getJDA().getGuildById(gid));
                         diff = System.currentTimeMillis() - time;
                         if(diff > 10000)
                             LOG.warn("Took " + diff + "ms to update " + gid);
@@ -107,7 +108,7 @@ public class ModLogger
     
     public void setNeedUpdate(Guild guild)
     {
-        if(vortex.getDatabase().settings.getSettings(guild).getModLogChannel(guild)==null)
+        if(Objects.requireNonNull(vortex.getDatabase().settings.getSettings(guild)).getModLogChannel(guild)==null)
             return;
         vortex.getThreadpool().schedule(() -> 
         {
@@ -120,7 +121,7 @@ public class ModLogger
     
     public int updateCase(Guild guild, int num, String reason)
     {
-        TextChannel modlog = vortex.getDatabase().settings.getSettings(guild).getModLogChannel(guild);
+        TextChannel modlog = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(guild)).getModLogChannel(guild);
         if(modlog==null)
             return -1;
         else if(!modlog.canTalk() || !guild.getSelfMember().hasPermission(modlog, Permission.MESSAGE_HISTORY))
@@ -139,13 +140,13 @@ public class ModLogger
         }
         if(m==null)
             return num==-1 ? -4 : -3;
-        m.editMessage(m.getContentRaw().replaceAll("(?is)\n`\\[ Reason \\]` .+", "\n`[ Reason ]` "+FormatUtil.filterEveryone(reason))).queue();
+        m.editMessage(m.getContentRaw().replaceAll("(?is)\n`\\[ Reason ]` .+", "\n`[ Reason ]` "+FormatUtil.filterEveryone(reason))).queue();
         return thiscase;
     }
     
     public void postCleanCase(Member moderator, OffsetDateTime now, int numMessages, TextChannel target, String criteria, String reason, MessageEmbed embed)
     {
-        TextChannel modlog = vortex.getDatabase().settings.getSettings(moderator.getGuild()).getModLogChannel(moderator.getGuild());
+        TextChannel modlog = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getModLogChannel(moderator.getGuild());
         if(modlog==null || !modlog.canTalk())
             return;
         getCaseNumberAsync(modlog, i ->
@@ -155,7 +156,7 @@ public class ModLogger
                 modlog.sendMessage(new MessageBuilder()
                         .setEmbed(embed)
                         .append(FormatUtil.filterEveryone(LogUtil.modlogCleanFormat(now, 
-                                vortex.getDatabase().settings.getSettings(moderator.getGuild()).getTimezone(), 
+                                Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getTimezone(),
                                 i, moderator.getUser(), numMessages, target, criteria, reason)))
                         .build()).queue();
             }
@@ -165,72 +166,59 @@ public class ModLogger
     
     public void postStrikeCase(Member moderator, OffsetDateTime now, int givenStrikes, int oldStrikes, int newStrikes, User target, String reason)
     {
-        TextChannel modlog = vortex.getDatabase().settings.getSettings(moderator.getGuild()).getModLogChannel(moderator.getGuild());
+        TextChannel modlog = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getModLogChannel(moderator.getGuild());
         if(modlog==null || !modlog.canTalk())
             return;
-        getCaseNumberAsync(modlog, i -> 
-        {
-            modlog.sendMessage(FormatUtil.filterEveryone(LogUtil.modlogStrikeFormat(now, 
-                    vortex.getDatabase().settings.getSettings(moderator.getGuild()).getTimezone(), i, 
-                    moderator.getUser(), givenStrikes, oldStrikes, newStrikes, target, reason))).queue();
-        });
+        getCaseNumberAsync(modlog, i -> modlog.sendMessage(FormatUtil.filterEveryone(LogUtil.modlogStrikeFormat(now,
+                Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getTimezone(), i,
+                moderator.getUser(), givenStrikes, oldStrikes, newStrikes, target, reason))).queue());
     }
     
     public void postPardonCase(Member moderator, OffsetDateTime now, int pardonedStrikes, int oldStrikes, int newStrikes, User target, String reason)
     {
-        TextChannel modlog = vortex.getDatabase().settings.getSettings(moderator.getGuild()).getModLogChannel(moderator.getGuild());
+        TextChannel modlog = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getModLogChannel(moderator.getGuild());
         if(modlog==null || !modlog.canTalk())
             return;
-        getCaseNumberAsync(modlog, i -> 
-        {
-            modlog.sendMessage(FormatUtil.filterEveryone(LogUtil.modlogPardonFormat(now, 
-                    vortex.getDatabase().settings.getSettings(moderator.getGuild()).getTimezone(), i, 
-                    moderator.getUser(), pardonedStrikes, oldStrikes, newStrikes, target, reason))).queue();
-        });
+        getCaseNumberAsync(modlog, i -> modlog.sendMessage(FormatUtil.filterEveryone(LogUtil.modlogPardonFormat(now,
+                Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getTimezone(), i,
+                moderator.getUser(), pardonedStrikes, oldStrikes, newStrikes, target, reason))).queue());
     }
     
     public void postRaidmodeCase(Member moderator, OffsetDateTime now, boolean enabled, String reason)
     {
-        TextChannel modlog = vortex.getDatabase().settings.getSettings(moderator.getGuild()).getModLogChannel(moderator.getGuild());
+        TextChannel modlog = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getModLogChannel(moderator.getGuild());
         if(modlog==null || !modlog.canTalk())
             return;
-        getCaseNumberAsync(modlog, i -> 
-        {
-            
-            modlog.sendMessage(FormatUtil.filterEveryone(LogUtil.modlogRaidFormat(now, 
-                    vortex.getDatabase().settings.getSettings(moderator.getGuild()).getTimezone(), i, 
-                    moderator.getUser(), enabled, reason))).queue();
-        });
+        getCaseNumberAsync(modlog, i -> modlog.sendMessage(FormatUtil.filterEveryone(LogUtil.modlogRaidFormat(now,
+                Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getTimezone(), i,
+                moderator.getUser(), enabled, reason))).queue());
     }
     
     public void postPseudoCase(Member moderator, OffsetDateTime now, Action act, User target, int minutes, String reason)
     {
-        TextChannel modlog = vortex.getDatabase().settings.getSettings(moderator.getGuild()).getModLogChannel(moderator.getGuild());
+        TextChannel modlog = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getModLogChannel(moderator.getGuild());
         if(modlog==null || !modlog.canTalk())
             return;
-        ZoneId timezone = vortex.getDatabase().settings.getSettings(moderator.getGuild()).getTimezone();
-        getCaseNumberAsync(modlog, i -> 
-        {
-            modlog.sendMessage(FormatUtil.filterEveryone(minutes > 0 ? 
-                            LogUtil.modlogTimeFormat(now, timezone, i, moderator.getUser(), act, minutes, target, reason) :
-                            LogUtil.modlogUserFormat(now, timezone, i, moderator.getUser(), act, target, reason))).queue();
-        });
+        ZoneId timezone = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getTimezone();
+        getCaseNumberAsync(modlog, i -> modlog.sendMessage(FormatUtil.filterEveryone(minutes > 0 ?
+                        LogUtil.modlogTimeFormat(now, timezone, i, moderator.getUser(), act, minutes, target, reason) :
+                        LogUtil.modlogUserFormat(now, timezone, i, moderator.getUser(), act, target, reason))).queue());
     }
     
     // private methods
     
-    private void update(Guild guild, int limit) // not async
+    private void update(Guild guild) // not async
     {
         if(guild==null)
             return;
         GuildSettings gs = vortex.getDatabase().settings.getSettings(guild);
-        TextChannel modlog = gs.getModLogChannel(guild);
+        TextChannel modlog = Objects.requireNonNull(gs).getModLogChannel(guild);
         if(modlog==null || !modlog.canTalk() || !modlog.getGuild().getSelfMember().hasPermission(Permission.VIEW_AUDIT_LOGS))
             return;
         Role mRole = gs.getMutedRole(guild);
         try
         {
-            List<AuditLogEntry> list = guild.retrieveAuditLogs().cache(false).limit(limit).submit().get(30, TimeUnit.SECONDS);
+            List<AuditLogEntry> list = guild.retrieveAuditLogs().cache(false).limit(40).submit().get(30, TimeUnit.SECONDS);
             for(AuditLogEntry ale: vortex.getDatabase().auditcache.filterUncheckedEntries(list)) 
             {
                 Action act = null;
@@ -251,7 +239,8 @@ public class ModLogger
                         AuditLogChange added = ale.getChangeByKey(AuditLogKey.MEMBER_ROLES_ADD);
                         if(added!=null)
                         {
-                            if (((ArrayList<HashMap<String,String>>)added.getNewValue()).stream().anyMatch(hm -> hm.get("id").equals(mRole.getId())))
+                            //noinspection unchecked
+                            if (((ArrayList<HashMap<String,String>>) Objects.requireNonNull(added.getNewValue())).stream().anyMatch(hm -> hm.get("id").equals(mRole.getId())))
                             {
                                 act = Action.MUTE;
                                 break;
@@ -260,7 +249,8 @@ public class ModLogger
                         AuditLogChange removed = ale.getChangeByKey(AuditLogKey.MEMBER_ROLES_REMOVE);
                         if(removed!=null)
                         {
-                            if (((ArrayList<HashMap<String,String>>)removed.getNewValue()).stream().anyMatch(hm -> hm.get("id").equals(mRole.getId())))
+                            //noinspection unchecked
+                            if (((ArrayList<HashMap<String,String>>) Objects.requireNonNull(removed.getNewValue())).stream().anyMatch(hm -> hm.get("id").equals(mRole.getId())))
                             {
                                 act = Action.UNMUTE;
                                 break;
@@ -279,8 +269,8 @@ public class ModLogger
                     User target = vortex.getJDA().getUserById(ale.getTargetIdLong());
                     if(target==null)
                         target = modlog.getJDA().retrieveUserById(ale.getTargetIdLong()).complete();
-                    ZoneId timezone = vortex.getDatabase().settings.getSettings(guild).getTimezone();
-                    if(mod.isBot())
+                    ZoneId timezone = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(guild)).getTimezone();
+                    if(Objects.requireNonNull(mod).isBot())
                     {
                         ParsedAuditReason parsed = LogUtil.parse(guild, reason);
                         if(parsed!=null)

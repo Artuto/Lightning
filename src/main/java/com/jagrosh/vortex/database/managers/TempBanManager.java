@@ -21,14 +21,15 @@ import com.jagrosh.easysql.SQLColumn;
 import com.jagrosh.easysql.columns.InstantColumn;
 import com.jagrosh.easysql.columns.LongColumn;
 import com.jagrosh.vortex.utils.Pair;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONObject;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -139,7 +140,7 @@ public class TempBanManager extends DataManager
             while(rs.next())
             {
                 Guild g = jda.getGuildById(GUILD_ID.getValue(rs));
-                if(g==null || !g.isAvailable() || !g.getSelfMember().hasPermission(Permission.BAN_MEMBERS))
+                if(g==null || !g.getSelfMember().hasPermission(Permission.BAN_MEMBERS))
                     continue;
                 g.unban(Long.toString(USER_ID.getValue(rs))).reason("Temporary Ban Completed").queue(s->{}, f->{});
                 rs.deleteRow();

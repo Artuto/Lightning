@@ -28,10 +28,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import org.json.JSONObject;
 
+import java.sql.ResultSet;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -76,8 +78,7 @@ public class TempMuteManager extends DataManager
     
     public boolean isMuted(Member member)
     {
-        return read(selectAll(GUILD_ID.is(member.getGuild().getId())+" AND "+USER_ID.is(member.getUser().getId())+" AND "+FINISH.isGreaterThan(Instant.now().getEpochSecond())), 
-                rs -> {return rs.next();});
+        return read(selectAll(GUILD_ID.is(member.getGuild().getId())+" AND "+USER_ID.is(member.getUser().getId())+" AND "+FINISH.isGreaterThan(Instant.now().getEpochSecond())), ResultSet::next);
     }
     
     public void setMute(Guild guild, long userId, Instant finish)
@@ -173,7 +174,7 @@ public class TempMuteManager extends DataManager
                 Guild g = jda.getGuildById(GUILD_ID.getValue(rs));
                 if(g==null || !g.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
                     continue;
-                Role mRole = data.getSettings(g).getMutedRole(g);
+                Role mRole = Objects.requireNonNull(data.getSettings(g)).getMutedRole(g);
                 if(mRole==null || !g.getSelfMember().canInteract(mRole))
                 {
                     rs.deleteRow();

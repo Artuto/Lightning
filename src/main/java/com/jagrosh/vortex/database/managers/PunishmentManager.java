@@ -18,19 +18,22 @@ package com.jagrosh.vortex.database.managers;
 import com.jagrosh.easysql.DataManager;
 import com.jagrosh.easysql.DatabaseConnector;
 import com.jagrosh.easysql.SQLColumn;
-import com.jagrosh.easysql.columns.*;
+import com.jagrosh.easysql.columns.IntegerColumn;
+import com.jagrosh.easysql.columns.LongColumn;
 import com.jagrosh.vortex.Action;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.utils.FormatUtil;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import org.json.JSONObject;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -157,7 +160,7 @@ public class PunishmentManager extends DataManager
                 max = p;
         if(from>=max.numStrikes)
             return Collections.singletonList(max);
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
     
     public Field getAllPunishmentsDisplay(Guild guild)
@@ -165,7 +168,7 @@ public class PunishmentManager extends DataManager
         List<Punishment> all = getAllPunishments(guild);
         if(all.isEmpty())
             return new Field(STRIKES_TITLE, "No strikes set!", true);
-        all.sort((a,b) -> a.numStrikes-b.numStrikes);
+        all.sort(Comparator.comparingInt(a -> a.numStrikes));
         StringBuilder sb = new StringBuilder();
         all.forEach(p -> sb.append("\n`").append(p.numStrikes).append(" ").append(Action.STRIKE.getEmoji()).append("`: **")
                 .append(FormatUtil.capitalize(p.action.name())).append("** ").append(p.action.getEmoji())
@@ -196,7 +199,7 @@ public class PunishmentManager extends DataManager
         });
     }
     
-    public class Punishment
+    public static class Punishment
     {
         public final Action action;
         public final int numStrikes;

@@ -103,7 +103,7 @@ public class LogUtil
     {
         if(m.getAuthor().getIdLong()!=m.getJDA().getSelfUser().getIdLong())
             return 0;
-        String match = "(?is)`\\[.{8}\\]` `\\["+(caseNum==-1 ? "(\\d+)" : caseNum)+"\\]` .+";
+        String match = "(?is)`\\[.{8}]` `\\["+(caseNum==-1 ? "(\\d+)" : caseNum)+"]` .+";
         if(m.getContentRaw().matches(match) && (caseNum!=-1 || m.getContentRaw().endsWith(NO_REASON)))
             return caseNum==-1 ? Integer.parseInt(m.getContentRaw().replaceAll(match, "$1")) : caseNum;
         return 0;
@@ -114,45 +114,25 @@ public class LogUtil
     {
         return String.format(BASICLOG_FORMAT, timeF(time, zone), emoji, content);
     }
-    
-    public static String logMessagesForwards(String title, List<Message> messages)
-    {
-        TextChannel deltc = messages.get(0).getTextChannel();
-        Guild delg = messages.get(0).getGuild();
-        StringBuilder sb = new StringBuilder("-- "+title+" -- #"+deltc.getName()+" ("+deltc.getId()+") -- "+delg.getName()+" ("+delg.getId()+") --");
-        Message m;
-        for(int i=0; i<messages.size(); i++)
-        {
-            m = messages.get(i);
-            sb.append("\r\n\r\n[")
-                .append(m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                .append("] ").append(m.getAuthor().getName()).append("#").append(m.getAuthor().getDiscriminator())
-                .append(" (").append(m.getAuthor().getId()).append(") : ").append(m.getContentRaw());
-            m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
-        }
-        return sb.toString().trim();
-    }
-    
+
     public static String logCachedMessagesForwards(String title, List<CachedMessage> messages, JDA jda)
     {
         TextChannel deltc = messages.get(0).getTextChannel(jda);
         Guild delg = deltc.getGuild();
         StringBuilder sb = new StringBuilder("-- "+title+" -- #"+deltc.getName()+" ("+deltc.getId()+") -- "+delg.getName()+" ("+delg.getId()+") --");
-        CachedMessage m;
-        for(int i=0; i<messages.size(); i++)
+
+        for(CachedMessage m : messages)
         {
-            m = messages.get(i);
             User author = m.getAuthor(jda);
-            sb.append("\r\n\r\n[")
-                .append(m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME))
-                .append("] ");
-            if(author==null)
+            sb.append("\r\n\r\n[").append(m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME)).append("] ");
+            if(author == null)
                 sb.append(m.getUsername()).append("#").append(m.getDiscriminator()).append(" (").append(m.getAuthorId());
             else
                 sb.append(author.getName()).append("#").append(author.getDiscriminator()).append(" (").append(author.getId());
             sb.append(") : ").append(m.getContentRaw());
             m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
         }
+
         return sb.toString().trim();
     }
     
@@ -215,7 +195,7 @@ public class LogUtil
                 Member mem = OtherUtil.findMember(m.group(1), m.group(2), guild);
                 if(mem==null)
                     return null;
-                Integer minutes = Integer.parseInt(m.group(3));
+                int minutes = Integer.parseInt(m.group(3));
                 return new ParsedAuditReason(mem, minutes, reasonF(m.group(4)));
             }
             

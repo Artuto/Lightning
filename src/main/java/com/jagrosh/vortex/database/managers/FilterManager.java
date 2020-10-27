@@ -18,17 +18,19 @@ package com.jagrosh.vortex.database.managers;
 import com.jagrosh.easysql.DataManager;
 import com.jagrosh.easysql.DatabaseConnector;
 import com.jagrosh.easysql.SQLColumn;
-import com.jagrosh.easysql.columns.*;
+import com.jagrosh.easysql.columns.IntegerColumn;
+import com.jagrosh.easysql.columns.LongColumn;
+import com.jagrosh.easysql.columns.StringColumn;
 import com.jagrosh.vortex.Action;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.automod.Filter;
 import com.jagrosh.vortex.utils.FixedCache;
-import java.util.ArrayList;
-import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
-import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -70,8 +72,7 @@ public class FilterManager extends DataManager
                 try
                 {
                     Filter filter = Filter.parseFilter(NAME.getValue(rs), STRIKES.getValue(rs), CONTENT.getValue(rs));
-                    if(filter != null)
-                        list.add(filter);
+                    list.add(filter);
                 }
                 catch(IllegalArgumentException ignore) {}
             }
@@ -161,10 +162,10 @@ public class FilterManager extends DataManager
         });
     }
     
-    public int deleteAllFilters(long guildId)
+    public void deleteAllFilters(long guildId)
     {
         invalidateCache(guildId);
-        return readWrite(selectAll(GUILD_ID.is(guildId)), rs -> 
+        readWrite(selectAll(GUILD_ID.is(guildId)), rs ->
         {
             int count = 0;
             while(rs.next())

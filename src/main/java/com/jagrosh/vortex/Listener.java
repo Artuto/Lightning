@@ -16,7 +16,6 @@
 package com.jagrosh.vortex;
 
 import com.jagrosh.vortex.logging.MessageCache.CachedMessage;
-import net.dv8tion.jda.api.JDA.ShardInfo;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -43,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -105,7 +105,7 @@ public class Listener implements EventListener
             // Get the messages we had cached
             List<CachedMessage> logged = gevent.getMessageIds().stream()
                     .map(id -> vortex.getMessageCache().pullMessage(gevent.getGuild(), Long.parseLong(id)))
-                    .filter(m -> m!=null)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             
             // Log the deletion
@@ -148,7 +148,7 @@ public class Listener implements EventListener
             GuildMemberRoleAddEvent gmrae = (GuildMemberRoleAddEvent) event;
             
             // Signal the modlogger if someone was muted
-            Role mRole = vortex.getDatabase().settings.getSettings(gmrae.getGuild()).getMutedRole(gmrae.getGuild());
+            Role mRole = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(gmrae.getGuild())).getMutedRole(gmrae.getGuild());
             if(gmrae.getRoles().contains(mRole))
                 vortex.getModLogger().setNeedUpdate(gmrae.getGuild());
         }
@@ -157,7 +157,7 @@ public class Listener implements EventListener
             GuildMemberRoleRemoveEvent gmrre = (GuildMemberRoleRemoveEvent) event;
             
             // Signal the modlogger if someone was unmuted
-            Role mRole = vortex.getDatabase().settings.getSettings(gmrre.getGuild()).getMutedRole(gmrre.getGuild());
+            Role mRole = Objects.requireNonNull(vortex.getDatabase().settings.getSettings(gmrre.getGuild())).getMutedRole(gmrre.getGuild());
             if(gmrre.getRoles().contains(mRole))
             {
                 vortex.getDatabase().tempmutes.removeMute(gmrre.getGuild(), gmrre.getUser().getIdLong());
@@ -169,7 +169,7 @@ public class Listener implements EventListener
             UserUpdateNameEvent unue = (UserUpdateNameEvent)event;
             // Log the name change
             vortex.getBasicLogger().logNameChange(unue);
-            unue.getUser().getMutualGuilds().stream().map(g -> g.getMember(unue.getUser())).forEach(m -> vortex.getAutoMod().dehoist(m));
+            unue.getUser().getMutualGuilds().stream().map(g -> g.getMember(unue.getUser())).filter(Objects::nonNull).forEach(m -> vortex.getAutoMod().dehoist(m));
         }
         else if (event instanceof UserUpdateDiscriminatorEvent)
         {
@@ -214,8 +214,8 @@ public class Listener implements EventListener
         else if (event instanceof ReadyEvent)
         {
             // Log the shard that has finished loading
-            ShardInfo si = event.getJDA().getShardInfo();
-            String shardinfo = si==null ? "1/1" : (si.getShardId()+1)+"/"+si.getShardTotal();
+            //ShardInfo si = event.getJDA().getShardInfo();
+            String shardinfo = /*si==null ?*/ "1/1" /*: (si.getShardId()+1)+"/"+si.getShardTotal()*/;
             LOG.info("Shard "+shardinfo+" is ready.");
             vortex.getLogWebhook().send("\uD83C\uDF00 Shard `"+shardinfo+"` has connected. Guilds: `" // 🌀
                     +event.getJDA().getGuildCache().size()+"` Users: `"+event.getJDA().getUserCache().size()+"`");

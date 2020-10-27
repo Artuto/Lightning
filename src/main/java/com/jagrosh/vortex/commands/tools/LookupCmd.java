@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.utils.WidgetUtil;
 import net.dv8tion.jda.api.utils.WidgetUtil.Widget;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  *
@@ -173,10 +174,11 @@ public class LookupCmd extends Command
             return;
         }
         catch(Exception ignore) {}
-        if(invite != null)
+        if(invite != null && invite.getType() == Invite.InviteType.GUILD)
         {
             try
             {
+                //noinspection ConstantConditions
                 widget = WidgetUtil.getWidget(invite.getGuild().getIdLong());
             }
             catch(Exception ignore) {}
@@ -192,16 +194,16 @@ public class LookupCmd extends Command
         if(invite == null)
         {
             if(widget == null)
-                return new MessageBuilder().append(Constants.ERROR + " No users, guilds, or invites found.").build();
+                return new MessageBuilder(Constants.ERROR + " No users, guilds, or invites found.").build();
             else if (!widget.isAvailable())
-                return new MessageBuilder().append(Constants.SUCCESS + " Guild with ID `" + widget.getId() + "` found; no further information found.").build();
+                return new MessageBuilder(Constants.SUCCESS + " Guild with ID `").append(widget.getId()).append("` found; no further information found.").build();
             gid = widget.getIdLong();
             gname = widget.getName();
             users = widget.getMembers().size();
         }
         else
         {
-            gid = invite.getGuild().getIdLong();
+            gid = Objects.requireNonNull(invite.getGuild()).getIdLong();
             gname = invite.getGuild().getName();
             users = invite.getGuild().getOnlineCount();
         }
@@ -212,12 +214,12 @@ public class LookupCmd extends Command
                 + "\n" + LINESTART + "Creation: **" + TimeUtil.getTimeCreated(gid).format(DateTimeFormatter.RFC_1123_DATE_TIME) + "**"
                 + "\n" + LINESTART + "Users: " + (users == -1 ? "N/A" : "**" + users + "** online")
                 + (widget != null && widget.isAvailable() ? "\n" + LINESTART + "Channels: **" + widget.getVoiceChannels().size() + "** voice" : ""));
-        if(invite != null)
+        if(invite != null && invite.getType() == Invite.InviteType.GUILD)
         {
             eb.setThumbnail(invite.getGuild().getIconUrl());
             eb.setImage(invite.getGuild().getSplashId() == null ? null : invite.getGuild().getSplashUrl() + "?size=1024");
             eb.addField("Invite Info", LINESTART + "Invite: **" + invite.getCode() + "**"
-                    + "\n" + LINESTART + "Channel: **" + (invite.getChannel().getType() == ChannelType.TEXT ? "#" : "") + invite.getChannel().getName() + "** (ID:" +invite.getChannel().getId() + ")"
+                    + "\n" + LINESTART + "Channel: **" + (Objects.requireNonNull(invite.getChannel()).getType() == ChannelType.TEXT ? "#" : "") + invite.getChannel().getName() + "** (ID:" +invite.getChannel().getId() + ")"
                     + "\n" + LINESTART + "Inviter: " + (invite.getInviter() == null ? "N/A" : FormatUtil.formatFullUser(invite.getInviter()))
                     + (invite.getGuild().getSplashId() == null ? "" : "\n" + LINESTART + "Splash: "), false);
         }

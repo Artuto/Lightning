@@ -16,6 +16,9 @@
 package com.jagrosh.vortex.logging;
 
 import com.typesafe.config.Config;
+import net.dv8tion.jda.api.entities.User;
+
+import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -24,8 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import javax.imageio.ImageIO;
-import net.dv8tion.jda.api.entities.User;
 
 /**
  *
@@ -125,7 +126,7 @@ public class AvatarSaver
             ImageIO.write(buf, "jpg", location(id, avyId));
             buf.getGraphics().dispose();
         }
-        catch(IOException ex) {}
+        catch(IOException ignored) {}
     }
     
     private File location(long id, String avyId)
@@ -138,6 +139,7 @@ public class AvatarSaver
             remainder %= (long)Math.pow(10, i);
             File directory = new File(dir);
             if(!directory.exists())
+                //noinspection ResultOfMethodCallIgnored
                 directory.mkdir();
         }
         return new File(dir + avyId + ".jpg");

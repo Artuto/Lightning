@@ -22,10 +22,11 @@ import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.commands.CommandExceptionListener.CommandErrorException;
 import com.jagrosh.vortex.commands.CommandExceptionListener.CommandWarningException;
 import com.jagrosh.vortex.utils.FormatUtil;
-import java.util.List;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+
+import java.util.List;
 
 /**
  *
@@ -91,18 +92,15 @@ public class AnnounceCmd extends Command
         if(!role.isMentionable())
         {
             String reason = "Announcement by "+event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator();
-            role.getManager().setMentionable(true).reason(reason).queue(s -> 
+            role.getManager().setMentionable(true).reason(reason).queue(s -> tc.sendMessage(fmessage).queue(m ->
             {
-                tc.sendMessage(fmessage).queue(m -> 
-                {
-                    event.replySuccess("Announcement for `"+role.getName()+"` sent to "+tc.getAsMention()+"!");
-                    role.getManager().setMentionable(false).reason(reason).queue(s2->{}, f2->{});
-                }, f -> 
-                {
-                    event.replyError("Failed to send message.");
-                    role.getManager().setMentionable(false).reason(reason).queue(s2->{}, f2->{});
-                });
-            }, f -> event.replyError("Failed to modify the role `"+role.getName()+"`."));
+                event.replySuccess("Announcement for `"+role.getName()+"` sent to "+tc.getAsMention()+"!");
+                role.getManager().setMentionable(false).reason(reason).queue(s2->{}, f2->{});
+            }, f ->
+            {
+                event.replyError("Failed to send message.");
+                role.getManager().setMentionable(false).reason(reason).queue(s2->{}, f2->{});
+            }), f -> event.replyError("Failed to modify the role `"+role.getName()+"`."));
         }
         else
         {

@@ -18,15 +18,18 @@ package com.jagrosh.vortex.database.managers;
 import com.jagrosh.easysql.DataManager;
 import com.jagrosh.easysql.DatabaseConnector;
 import com.jagrosh.easysql.SQLColumn;
-import com.jagrosh.easysql.columns.*;
+import com.jagrosh.easysql.columns.BooleanColumn;
+import com.jagrosh.easysql.columns.IntegerColumn;
+import com.jagrosh.easysql.columns.LongColumn;
 import com.jagrosh.vortex.Action;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.utils.FixedCache;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import org.json.JSONObject;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -154,7 +157,7 @@ public class AutomodManager extends DataManager
     
     public boolean hasSettings(Guild guild)
     {
-        return read(selectAll(GUILD_ID.is(guild.getIdLong())), rs -> {return rs.next();});
+        return read(selectAll(GUILD_ID.is(guild.getIdLong())), ResultSet::next);
     }
     
     // Setters
@@ -413,7 +416,7 @@ public class AutomodManager extends DataManager
         cache.pull(guildId);
     }
     
-    public class AutomodSettings
+    public static class AutomodSettings
     {
         public final boolean resolveUrls;
         public final int maxMentions, maxRoleMentions;
