@@ -15,14 +15,14 @@
  */
 package com.jagrosh.vortex.commands.owner;
 
-import java.time.OffsetDateTime;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.utils.FormatUtil;
+
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import net.dv8tion.jda.core.JDA;
 
 /**
  *
@@ -51,7 +51,7 @@ public class DebugCmd extends Command
                 + "\nLast Startup: "+FormatUtil.secondsToTime(Constants.STARTUP.until(OffsetDateTime.now(), ChronoUnit.SECONDS))+" ago"
                 + "\nGuilds: **"+vortex.getJDA().getGuildCache().size()+"**"
                 + "\nMemory: **"+usedMb+"**Mb / **"+totalMb+"**Mb"
-                + "\nPing: **"+vortex.getJDA().getPing()+"**ms"
+                + "\nPing: **"+vortex.getJDA().getGatewayPing()+"**ms"
                 /*+ "\nShard Total: **"+vortex.getJDA().getShardsTotal()+"**"
                 + "\nShard Connectivity: ```diff");
         vortex.getJDA().getShards().forEach(jda -> sb.append("\n").append(jda.getStatus()==JDA.Status.CONNECTED ? "+ " : "- ")

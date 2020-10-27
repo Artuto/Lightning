@@ -20,14 +20,14 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.commands.CommandExceptionListener.CommandErrorException;
 import com.jagrosh.vortex.commands.ModCommand;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import com.jagrosh.vortex.utils.ArgsUtil;
 import com.jagrosh.vortex.utils.FormatUtil;
 import com.jagrosh.vortex.utils.LogUtil;
 import java.util.List;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 
 /**
  *
@@ -97,7 +97,7 @@ public class VoicekickCmd extends ModCommand
             VoiceChannel vc;
             try
             {
-                vc = (VoiceChannel)event.getGuild().getController().createVoiceChannel("Voice Kick Channel")
+                vc = (VoiceChannel)event.getGuild().createVoiceChannel("Voice Kick Channel")
                     .setParent(toKick.get(0).getVoiceState().getChannel().getParent()).reason(reason).complete();
             }
             catch(Exception ex)
@@ -111,7 +111,7 @@ public class VoicekickCmd extends ModCommand
                 Member m = toKick.get(i);
                 try
                 {
-                    event.getGuild().getController().moveVoiceMember(m, vc).complete();
+                    event.getGuild().moveVoiceMember(m, vc).complete();
                     builder.append("\n").append(event.getClient().getSuccess()).append(" Successfully voicekicked ").append(FormatUtil.formatUser(m.getUser()));
                 }
                 catch(Exception ex)

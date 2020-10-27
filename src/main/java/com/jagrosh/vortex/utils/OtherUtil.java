@@ -15,6 +15,13 @@
  */
 package com.jagrosh.vortex.utils;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -22,12 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -59,7 +60,7 @@ public class OtherUtil
                 break;
             }
         }
-        m.getGuild().getController().setNickname(m, newname).reason("Dehoisting").queue();
+        m.getGuild().modifyNickname(m, newname).reason("Dehoisting").queue();
         return true;
     }
     
@@ -128,16 +129,21 @@ public class OtherUtil
         }
     }
 
-    public static ByteArrayOutputStream downloadAttachment(Message.Attachment attachment) throws IOException
+    public static ByteArrayOutputStream downloadAttachment(Message.Attachment attachment)
     {
         ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-        attachment.withInputStream(inputStream -> {
-            while(true)
+        attachment.retrieveInputStream().thenAccept(inputStream ->
+        {
+            try
             {
-                int result = inputStream.read();
-                if (result == -1) break;
-                byteArray.write(result);
+                while(true)
+                {
+                    int result = inputStream.read();
+                    if (result == -1) break;
+                    byteArray.write(result);
+                }
             }
+            catch(IOException ignored) {}
         });
 
         return byteArray;

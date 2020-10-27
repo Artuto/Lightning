@@ -15,16 +15,15 @@
  */
 package com.jagrosh.vortex.logging;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 import com.jagrosh.vortex.Vortex;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Category;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  *
@@ -58,7 +57,7 @@ public class TextUploader
             return;
         Category category = guild.getCategoryById(categoryId);
         List<TextChannel> list = category.getTextChannels();
-        list.get(index % list.size()).sendFile(content.getBytes(StandardCharsets.UTF_8), filename+".txt", null).queue(
+        list.get(index % list.size()).sendFile(content.getBytes(StandardCharsets.UTF_8), filename+".txt").queue(
                 m -> done.consume(
                         "https://txt.discord.website?txt="+m.getAttachments().get(0).getUrl().substring(m.getAttachments().get(0).getUrl().indexOf("s/")+2, m.getAttachments().get(0).getUrl().length()-4), 
                         m.getAttachments().get(0).getUrl()), 
@@ -67,8 +66,8 @@ public class TextUploader
     }
     
     
-    public static interface Result
+    public interface Result
     {
-        public abstract void consume(String view, String download);
+        void consume(String view, String download);
     }
 }

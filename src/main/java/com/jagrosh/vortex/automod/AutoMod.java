@@ -17,14 +17,26 @@ package com.jagrosh.vortex.automod;
 
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.Vortex;
+import com.jagrosh.vortex.automod.URLResolver.ActiveURLResolver;
+import com.jagrosh.vortex.automod.URLResolver.DummyURLResolver;
 import com.jagrosh.vortex.database.managers.AutomodManager;
 import com.jagrosh.vortex.database.managers.AutomodManager.AutomodSettings;
 import com.jagrosh.vortex.logging.MessageCache.CachedMessage;
-import com.jagrosh.vortex.automod.URLResolver.*;
 import com.jagrosh.vortex.utils.FixedCache;
 import com.jagrosh.vortex.utils.OtherUtil;
 import com.jagrosh.vortex.utils.Usage;
 import com.typesafe.config.Config;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Guild.VerificationLevel;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -37,14 +49,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.entities.Guild.VerificationLevel;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.core.exceptions.PermissionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -163,8 +167,8 @@ public class AutoMod
         else if(ams.useAutoRaidMode())
         {
             // find the time that we should be looking after, and count the number of people that joined after that
-            OffsetDateTime min = event.getMember().getJoinDate().minusSeconds(ams.raidmodeTime);
-            long recent = event.getGuild().getMemberCache().stream().filter(m -> !m.getUser().isBot() && m.getJoinDate().isAfter(min)).count();
+            OffsetDateTime min = event.getMember().getTimeJoined().minusSeconds(ams.raidmodeTime);
+            long recent = event.getGuild().getMemberCache().stream().filter(m -> !m.getUser().isBot() && m.getTimeJoined().isAfter(min)).count();
             if(recent>=ams.raidmodeNumber)
             {
                 enableRaidMode(event.getGuild(), event.getGuild().getSelfMember(), now, "Maximum join rate exceeded ("+ams.raidmodeNumber+"/"+ams.raidmodeTime+"s)");
@@ -179,7 +183,7 @@ public class AutoMod
                     {
                         try
                         {
-                            event.getGuild().getController().kick(event.getMember(), "Anti-Raid Mode").queue();
+                            event.getGuild().kick(event.getMember(), "Anti-Raid Mode").queue();
                         }catch(Exception ignore){}
                     });
         }
@@ -189,8 +193,8 @@ public class AutoMod
             {
                 try
                 {
-                    event.getGuild().getController()
-                            .addSingleRoleToMember(event.getMember(), vortex.getDatabase().settings.getSettings(event.getGuild()).getMutedRole(event.getGuild()))
+                    event.getGuild().addRoleToMember(event.getMember(),
+                            vortex.getDatabase().settings.getSettings(event.getGuild()).getMutedRole(event.getGuild()))
                             .reason(RESTORE_MUTE_ROLE_AUDIT).queue();
                 } catch(Exception ignore){}
             }
@@ -204,11 +208,11 @@ public class AutoMod
     private boolean shouldPerformAutomod(Member member, TextChannel channel)
     {
         // ignore users not in the guild
-        if(member==null || member.getGuild()==null)
+        if(member==null)
             return false;
         
         // ignore broken guilds
-        if(member.getGuild().getSelfMember()==null || member.getGuild().getOwner()==null)
+        if(member.getGuild().getOwner()==null)
             return false;
         
         // ignore bots
@@ -307,7 +311,7 @@ public class AutoMod
                 if(offenses==settings.dupeDeleteThresh)
                 {
                     channelWarning = "Please stop spamming.";
-                    purgeMessages(message.getGuild(), m -> m.getAuthorId()==message.getAuthor().getIdLong() && m.getCreationTime().plusMinutes(2).isAfter(now));
+                    purgeMessages(message.getGuild(), m -> m.getAuthorId()==message.getAuthor().getIdLong() && m.getTimeCreated().plusMinutes(2).isAfter(now));
                 }
                 else if(offenses>settings.dupeDeleteThresh)
                     shouldDelete = true;
@@ -524,18 +528,18 @@ public class AutoMod
     
     private void purgeMessages(Guild guild, Predicate<CachedMessage> predicate)
     {
-        vortex.getMessageCache().getMessages(guild, predicate).stream()
-                .collect(Collectors.groupingBy(CachedMessage::getTextChannelId)).entrySet().forEach(entry -> 
+        vortex.getMessageCache().getMessages(guild, predicate).stream().collect(Collectors.groupingBy(CachedMessage::getTextChannelId)).forEach((key, value) ->
         {
             try
             {
-                TextChannel mtc = guild.getTextChannelById(entry.getKey());
+                TextChannel mtc = guild.getTextChannelById(key);
                 if(mtc != null)
-                    mtc.purgeMessagesById(entry.getValue().stream().map(CachedMessage::getId).collect(Collectors.toList()));
+                    mtc.purgeMessagesById(value.stream().map(CachedMessage::getId).collect(Collectors.toList()));
             }
             catch(PermissionException ignore) {}
-            catch(Exception ex) { LOG.error("Error in purging messages: ", ex); }
-        });//*/
+            catch(Exception ex) {LOG.error("Error in purging messages: ", ex);}
+        });
+        //*/
         /*vortex.getMessageCache().getMessages(guild, predicate).forEach(m -> 
         {
             
@@ -573,7 +577,7 @@ public class AutoMod
     
     private static OffsetDateTime latestTime(Message m)
     {
-        return m.isEdited() ? m.getEditedTime() : m.getCreationTime();
+        return m.isEdited() ? m.getTimeEdited() : m.getTimeCreated();
     }
     
     private class DupeStatus

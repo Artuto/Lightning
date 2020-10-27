@@ -17,19 +17,19 @@ package com.jagrosh.vortex.utils;
 
 import com.jagrosh.vortex.Action;
 import com.jagrosh.vortex.logging.MessageCache.CachedMessage;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
 
 /**
  *
@@ -125,7 +125,7 @@ public class LogUtil
         {
             m = messages.get(i);
             sb.append("\r\n\r\n[")
-                .append(m.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                .append(m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME))
                 .append("] ").append(m.getAuthor().getName()).append("#").append(m.getAuthor().getDiscriminator())
                 .append(" (").append(m.getAuthor().getId()).append(") : ").append(m.getContentRaw());
             m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
@@ -144,7 +144,7 @@ public class LogUtil
             m = messages.get(i);
             User author = m.getAuthor(jda);
             sb.append("\r\n\r\n[")
-                .append(m.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                .append(m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME))
                 .append("] ");
             if(author==null)
                 sb.append(m.getUsername()).append("#").append(m.getDiscriminator()).append(" (").append(m.getAuthorId());
@@ -166,7 +166,7 @@ public class LogUtil
         {
             m = messages.get(i);
             sb.append("\r\n\r\n[")
-                .append(m.getCreationTime().format(DateTimeFormatter.RFC_1123_DATE_TIME))
+                .append(m.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME))
                 .append("] ").append(m.getAuthor().getName()).append("#").append(m.getAuthor().getDiscriminator())
                 .append(" (").append(m.getAuthor().getId()).append(") : ").append(m.getContentRaw());
             m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));

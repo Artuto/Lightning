@@ -15,9 +15,10 @@
  */
 package com.jagrosh.vortex.utils;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.utils.JDALogger;
-import net.dv8tion.jda.core.utils.SessionControllerAdapter;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.utils.SessionControllerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -26,6 +27,7 @@ import net.dv8tion.jda.core.utils.SessionControllerAdapter;
 public class BlockingSessionController extends SessionControllerAdapter
 {
     private final int MAX_DELAY = 60*1000; // 1 minute
+    private final Logger logger = LoggerFactory.getLogger(SessionControllerAdapter.class);
     
     @Override
     protected void runWorker()
@@ -56,7 +58,7 @@ public class BlockingSessionController extends SessionControllerAdapter
             }
             catch (InterruptedException ex)
             {
-                JDALogger.getLog(SessionControllerAdapter.class).error("Unable to backoff", ex);
+                logger.error("Unable to backoff", ex);
             }
             while (!connectQueue.isEmpty())
             {
@@ -80,7 +82,7 @@ public class BlockingSessionController extends SessionControllerAdapter
                 }
                 catch (InterruptedException e)
                 {
-                    JDALogger.getLog(SessionControllerAdapter.class).error("Failed to run node", e);
+                    logger.error("Failed to run node", e);
                     appendSession(node);
                 }
             }

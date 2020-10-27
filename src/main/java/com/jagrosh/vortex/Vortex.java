@@ -15,24 +15,68 @@
  */
 package com.jagrosh.vortex;
 
-import com.jagrosh.vortex.commands.tools.LookupCmd;
-import com.jagrosh.vortex.commands.automod.*;
-import com.jagrosh.vortex.commands.general.*;
-import com.jagrosh.vortex.commands.moderation.*;
-import com.jagrosh.vortex.commands.tools.*;
-import com.jagrosh.vortex.commands.owner.*;
-import com.jagrosh.vortex.commands.settings.*;
-import java.util.concurrent.Executors;
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.examples.command.*;
+import com.jagrosh.jdautilities.examples.command.PingCommand;
 import com.jagrosh.vortex.automod.AutoMod;
 import com.jagrosh.vortex.automod.StrikeHandler;
 import com.jagrosh.vortex.commands.CommandExceptionListener;
-import java.util.concurrent.ScheduledExecutorService;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
+import com.jagrosh.vortex.commands.automod.AnticopypastaCmd;
+import com.jagrosh.vortex.commands.automod.AntiduplicateCmd;
+import com.jagrosh.vortex.commands.automod.AntieveryoneCmd;
+import com.jagrosh.vortex.commands.automod.AntiinviteCmd;
+import com.jagrosh.vortex.commands.automod.AntirefCmd;
+import com.jagrosh.vortex.commands.automod.AutodehoistCmd;
+import com.jagrosh.vortex.commands.automod.AutoraidmodeCmd;
+import com.jagrosh.vortex.commands.automod.FilterCmd;
+import com.jagrosh.vortex.commands.automod.IgnoreCmd;
+import com.jagrosh.vortex.commands.automod.MaxlinesCmd;
+import com.jagrosh.vortex.commands.automod.MaxmentionsCmd;
+import com.jagrosh.vortex.commands.automod.ResolvelinksCmd;
+import com.jagrosh.vortex.commands.automod.UnignoreCmd;
+import com.jagrosh.vortex.commands.general.RoleinfoCmd;
+import com.jagrosh.vortex.commands.general.ServerinfoCmd;
+import com.jagrosh.vortex.commands.general.UserinfoCmd;
+import com.jagrosh.vortex.commands.moderation.BanCmd;
+import com.jagrosh.vortex.commands.moderation.CheckCmd;
+import com.jagrosh.vortex.commands.moderation.CleanCmd;
+import com.jagrosh.vortex.commands.moderation.KickCmd;
+import com.jagrosh.vortex.commands.moderation.MuteCmd;
+import com.jagrosh.vortex.commands.moderation.PardonCmd;
+import com.jagrosh.vortex.commands.moderation.RaidCmd;
+import com.jagrosh.vortex.commands.moderation.ReasonCmd;
+import com.jagrosh.vortex.commands.moderation.SilentbanCmd;
+import com.jagrosh.vortex.commands.moderation.SoftbanCmd;
+import com.jagrosh.vortex.commands.moderation.StrikeCmd;
+import com.jagrosh.vortex.commands.moderation.UnbanCmd;
+import com.jagrosh.vortex.commands.moderation.UnmuteCmd;
+import com.jagrosh.vortex.commands.moderation.VoicekickCmd;
+import com.jagrosh.vortex.commands.moderation.VoicemoveCmd;
+import com.jagrosh.vortex.commands.owner.DebugCmd;
+import com.jagrosh.vortex.commands.owner.EvalCmd;
+import com.jagrosh.vortex.commands.owner.ImportCmd;
+import com.jagrosh.vortex.commands.owner.PremiumCmd;
+import com.jagrosh.vortex.commands.owner.ReloadCmd;
+import com.jagrosh.vortex.commands.settings.AvatarlogCmd;
+import com.jagrosh.vortex.commands.settings.MessagelogCmd;
+import com.jagrosh.vortex.commands.settings.ModlogCmd;
+import com.jagrosh.vortex.commands.settings.ModroleCmd;
+import com.jagrosh.vortex.commands.settings.PrefixCmd;
+import com.jagrosh.vortex.commands.settings.PunishmentCmd;
+import com.jagrosh.vortex.commands.settings.ServerlogCmd;
+import com.jagrosh.vortex.commands.settings.SettingsCmd;
+import com.jagrosh.vortex.commands.settings.SetupCmd;
+import com.jagrosh.vortex.commands.settings.TimezoneCmd;
+import com.jagrosh.vortex.commands.settings.VoicelogCmd;
+import com.jagrosh.vortex.commands.tools.AnnounceCmd;
+import com.jagrosh.vortex.commands.tools.AuditCmd;
+import com.jagrosh.vortex.commands.tools.DehoistCmd;
+import com.jagrosh.vortex.commands.tools.ExportCmd;
+import com.jagrosh.vortex.commands.tools.InvitepruneCmd;
+import com.jagrosh.vortex.commands.tools.LookupCmd;
 import com.jagrosh.vortex.database.Database;
 import com.jagrosh.vortex.logging.BasicLogger;
 import com.jagrosh.vortex.logging.MessageCache;
@@ -40,20 +84,20 @@ import com.jagrosh.vortex.logging.ModLogger;
 import com.jagrosh.vortex.logging.TextUploader;
 import com.jagrosh.vortex.utils.BlockingSessionController;
 import com.jagrosh.vortex.utils.FormatUtil;
-import com.jagrosh.vortex.utils.OtherUtil;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 
-import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.exceptions.PermissionException;
-import net.dv8tion.jda.core.utils.cache.CacheFlag;
-import net.dv8tion.jda.webhook.WebhookClient;
-import net.dv8tion.jda.webhook.WebhookClientBuilder;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -72,8 +116,7 @@ public class Vortex
     private final WebhookClient logwebhook;
     private final AutoMod automod;
     private final StrikeHandler strikehandler;
-    private final CommandExceptionListener listener;
-    
+
     public Vortex() throws Exception
     {
         System.setProperty("config.file", System.getProperty("config.file", "application.conf"));
@@ -90,14 +133,14 @@ public class Vortex
         logwebhook = new WebhookClientBuilder(config.getString("webhook-url")).build();
         automod = new AutoMod(this, config);
         strikehandler = new StrikeHandler(this);
-        listener = new CommandExceptionListener();
+
         CommandClient client = new CommandClientBuilder()
                         .setPrefix(Constants.PREFIX)
                         .setOwnerId(Constants.OWNER_ID)
                         .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
                         .setLinkedCacheSize(0)
                         .setGuildSettingsManager(database.settings)
-                        .setListener(listener)
+                        .setListener(new CommandExceptionListener())
                         .setScheduleExecutor(threadpool)
                         .setShutdownAutomatically(false)
                         .addCommands(
@@ -179,22 +222,21 @@ public class Vortex
                                 } catch(PermissionException ignore) {}
                         }, t -> event.replyWarning("Help cannot be sent because you are blocking Direct Messages.")))
                         .build();
-        jda = new JDABuilder()
-                .setToken(config.getString("bot-token"))
-                .addEventListener(new Listener(this), client, waiter)
+
+        jda = JDABuilder.createDefault(config.getString("bot-token"))
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .setChunkingFilter(ChunkingFilter.ALL)
+                .addEventListeners(new Listener(this), client, waiter)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setGame(Game.playing("loading..."))
+                .setActivity(Activity.playing("loading..."))
                 .setBulkDeleteSplittingEnabled(false)
                 .setRequestTimeoutRetry(true)
-                .setDisabledCacheFlags(EnumSet.of(CacheFlag.EMOTE, CacheFlag.GAME))
                 .setSessionController(new BlockingSessionController())
                 .build().awaitReady();
         
         modlog.start();
-
         threadpool.scheduleWithFixedDelay(System::gc, 12, 6, TimeUnit.HOURS);
     }
-    
     
     // Getters
     public EventWaiter getEventWaiter()
@@ -252,14 +294,9 @@ public class Vortex
         return strikehandler;
     }
     
-    public CommandExceptionListener getListener()
-    {
-        return listener;
-    }
-    
     /**
      * @param args the command line arguments
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception if an error occurred
      */
     public static void main(String[] args) throws Exception
     {

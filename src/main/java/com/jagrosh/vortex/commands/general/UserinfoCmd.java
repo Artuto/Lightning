@@ -15,22 +15,21 @@
  */
 package com.jagrosh.vortex.commands.general;
 
-import java.time.format.DateTimeFormatter;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.vortex.utils.FormatUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.utils.TimeUtil;
+
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.utils.MiscUtil;
 
 /**
  *
@@ -90,16 +89,16 @@ public class UserinfoCmd extends Command
         else
             roles=roles.substring(3)+"`";
         str+="\n"+LINESTART+"Roles: "+roles;
-        str+="\n"+LINESTART+"Status: "+statusToEmote(member.getOnlineStatus(), member.getGame())+"**"+member.getOnlineStatus().name()+"**";
+        /*str+="\n"+LINESTART+"Status: "+statusToEmote(member.getOnlineStatus(), member.getGame())+"**"+member.getOnlineStatus().name()+"**";
         Game game = member.getGame();
         if(game!=null)
-            str+=" ("+formatGame(game)+")";
-        str+="\n"+LINESTART+"Account Creation: **"+MiscUtil.getDateTimeString(MiscUtil.getCreationTime(user))+"**";
+            str+=" ("+formatGame(game)+")";*/
+        str+="\n"+LINESTART+"Account Creation: **"+ TimeUtil.getDateTimeString(TimeUtil.getTimeCreated(user))+"**";
         
         List<Member> joins = new ArrayList<>(event.getGuild().getMembers());
-        Collections.sort(joins, (Member a, Member b) -> a.getJoinDate().compareTo(b.getJoinDate()));
+        joins.sort(Comparator.comparing(Member::getTimeJoined));
         int index = joins.indexOf(member);
-        str+="\n"+LINESTART+"Guild Join Date: **"+member.getJoinDate().format(DateTimeFormatter.RFC_1123_DATE_TIME) + "** `(#"+(index+1)+")`";
+        str+="\n"+LINESTART+"Guild Join Date: **"+member.getTimeJoined().format(DateTimeFormatter.RFC_1123_DATE_TIME) + "** `(#"+(index+1)+")`";
         index-=3;
         if(index<0)
             index=0;
@@ -128,7 +127,7 @@ public class UserinfoCmd extends Command
                 .build());
     }
     
-    private static String statusToEmote(OnlineStatus status, Game game)
+    /*private static String statusToEmote(OnlineStatus status, Game game)
     {
         if(game!=null && game.getType()==Game.GameType.STREAMING && game.getUrl()!=null && Game.isValidStreamingUrl(game.getUrl()))
             return "<:streaming:313956277132853248>";
@@ -161,5 +160,5 @@ public class UserinfoCmd extends Command
                 break;
         }
         return str+" *"+game.getName()+"*";
-    }
+    }*/
 }

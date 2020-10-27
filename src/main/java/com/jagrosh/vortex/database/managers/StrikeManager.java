@@ -21,8 +21,8 @@ import com.jagrosh.easysql.SQLColumn;
 import com.jagrosh.easysql.columns.*;
 import java.util.HashMap;
 import java.util.Map;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -21,11 +21,12 @@ import com.jagrosh.jdautilities.menu.ButtonMenu;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.commands.CommandExceptionListener.CommandErrorException;
 import com.jagrosh.vortex.commands.CommandExceptionListener.CommandWarningException;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Invite;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Invite;
 
 /**
  *
@@ -76,7 +77,7 @@ public class InvitepruneCmd extends Command
     private void pruneInvites(int uses, CommandEvent event)
     {
         event.getChannel().sendTyping().queue();
-        event.getGuild().getInvites().queue(list -> 
+        event.getGuild().retrieveInvites().queue(list ->
         {
             List<Invite> toPrune = list.stream().filter(i -> i.getInviter()!=null && !i.getInviter().isBot() && i.getUses()<=uses).collect(Collectors.toList());
             toPrune.forEach(i -> i.delete().queue());

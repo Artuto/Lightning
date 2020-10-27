@@ -15,8 +15,9 @@
  */
 package com.jagrosh.vortex;
 
+import net.dv8tion.jda.api.Permission;
+
 import java.time.OffsetDateTime;
-import net.dv8tion.jda.core.Permission;
 
 /**
  *

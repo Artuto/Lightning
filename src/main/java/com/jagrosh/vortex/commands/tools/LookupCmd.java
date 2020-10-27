@@ -21,17 +21,18 @@ import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.database.managers.PremiumManager;
 import com.jagrosh.vortex.utils.FormatUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Invite;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.RateLimitedException;
+import net.dv8tion.jda.api.utils.TimeUtil;
+import net.dv8tion.jda.api.utils.WidgetUtil;
+import net.dv8tion.jda.api.utils.WidgetUtil.Widget;
+
 import java.time.format.DateTimeFormatter;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Invite;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
-import net.dv8tion.jda.core.utils.MiscUtil;
-import net.dv8tion.jda.core.utils.WidgetUtil;
-import net.dv8tion.jda.core.utils.WidgetUtil.Widget;
 
 /**
  *
@@ -127,7 +128,7 @@ public class LookupCmd extends Command
         String str = LINESTART + "Discord ID: **" + u.getId() + "**";
         if(u.getAvatarId() != null && u.getAvatarId().startsWith("a_"))
             str+= " <:nitro:314068430611415041>";
-        str += "\n" + LINESTART + "Account Creation: **" + MiscUtil.getDateTimeString(u.getCreationTime()) + "**";
+        str += "\n" + LINESTART + "Account Creation: **" + TimeUtil.getDateTimeString(u.getTimeCreated()) + "**";
         eb.setDescription(str);
         event.reply(new MessageBuilder().append(FormatUtil.filterEveryone(text)).setEmbed(eb.build()).build());
         return true;
@@ -208,7 +209,7 @@ public class LookupCmd extends Command
         String text = GUILD_EMOJI + " Information about **" + gname + "**:";
         EmbedBuilder eb = new EmbedBuilder();
         eb.appendDescription(LINESTART + "ID: **" + gid + "**"
-                + "\n" + LINESTART + "Creation: **" + MiscUtil.getCreationTime(gid).format(DateTimeFormatter.RFC_1123_DATE_TIME) + "**"
+                + "\n" + LINESTART + "Creation: **" + TimeUtil.getTimeCreated(gid).format(DateTimeFormatter.RFC_1123_DATE_TIME) + "**"
                 + "\n" + LINESTART + "Users: " + (users == -1 ? "N/A" : "**" + users + "** online")
                 + (widget != null && widget.isAvailable() ? "\n" + LINESTART + "Channels: **" + widget.getVoiceChannels().size() + "** voice" : ""));
         if(invite != null)

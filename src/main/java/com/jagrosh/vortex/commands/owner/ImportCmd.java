@@ -20,7 +20,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.database.Database;
 import com.jagrosh.vortex.utils.OtherUtil;
-import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;

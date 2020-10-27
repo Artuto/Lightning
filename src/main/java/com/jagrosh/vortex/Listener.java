@@ -16,30 +16,35 @@
 package com.jagrosh.vortex;
 
 import com.jagrosh.vortex.logging.MessageCache.CachedMessage;
+import net.dv8tion.jda.api.JDA.ShardInfo;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.guild.GuildBanEvent;
+import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.message.MessageBulkDeleteEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.api.events.user.update.UserUpdateAvatarEvent;
+import net.dv8tion.jda.api.events.user.update.UserUpdateDiscriminatorEvent;
+import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
+import net.dv8tion.jda.api.hooks.EventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.core.JDA.ShardInfo;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.guild.GuildBanEvent;
-import net.dv8tion.jda.core.events.guild.GuildUnbanEvent;
-import net.dv8tion.jda.core.events.guild.member.*;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
-import net.dv8tion.jda.core.events.message.MessageBulkDeleteEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
-import net.dv8tion.jda.core.events.user.update.UserUpdateAvatarEvent;
-import net.dv8tion.jda.core.events.user.update.UserUpdateDiscriminatorEvent;
-import net.dv8tion.jda.core.events.user.update.UserUpdateNameEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -56,7 +61,7 @@ public class Listener implements EventListener
     }
 
     @Override
-    public void onEvent(Event event)
+    public void onEvent(GenericEvent event)
     {
         if (event instanceof GuildMessageReceivedEvent)
         {
@@ -116,15 +121,15 @@ public class Listener implements EventListener
             // Perform automod on the newly-joined member
             vortex.getAutoMod().memberJoin(gevent);
         }
-        else if (event instanceof GuildMemberLeaveEvent)
+        else if (event instanceof GuildMemberRemoveEvent)
         {
-            GuildMemberLeaveEvent gmle = (GuildMemberLeaveEvent)event;
+            GuildMemberRemoveEvent gmre = (GuildMemberRemoveEvent)event;
             
             // Log the member leaving
-            vortex.getBasicLogger().logGuildLeave(gmle);
+            vortex.getBasicLogger().logGuildLeave(gmre);
             
             // Signal the modlogger because someone might have been kicked
-            vortex.getModLogger().setNeedUpdate(gmle.getGuild());
+            vortex.getModLogger().setNeedUpdate(gmre.getGuild());
         }
         else if (event instanceof GuildBanEvent)
         {
@@ -170,9 +175,9 @@ public class Listener implements EventListener
         {
             vortex.getBasicLogger().logNameChange((UserUpdateDiscriminatorEvent)event);
         }
-        else if (event instanceof GuildMemberNickChangeEvent)
+        else if (event instanceof GuildMemberUpdateNicknameEvent)
         {
-            vortex.getAutoMod().dehoist(((GuildMemberNickChangeEvent) event).getMember());
+            vortex.getAutoMod().dehoist(((GuildMemberUpdateNicknameEvent) event).getMember());
         }
         else if (event instanceof UserUpdateAvatarEvent)
         {

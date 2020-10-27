@@ -21,16 +21,17 @@ import com.jagrosh.easysql.SQLColumn;
 import com.jagrosh.easysql.columns.InstantColumn;
 import com.jagrosh.easysql.columns.LongColumn;
 import com.jagrosh.vortex.utils.Pair;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import org.json.JSONObject;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import org.json.JSONObject;
 
 /**
  *
@@ -170,7 +171,7 @@ public class TempMuteManager extends DataManager
             while(rs.next())
             {
                 Guild g = jda.getGuildById(GUILD_ID.getValue(rs));
-                if(g==null || !g.isAvailable() || !g.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+                if(g==null || !g.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
                     continue;
                 Role mRole = data.getSettings(g).getMutedRole(g);
                 if(mRole==null || !g.getSelfMember().canInteract(mRole))
@@ -180,7 +181,7 @@ public class TempMuteManager extends DataManager
                 }
                 Member m = g.getMemberById(USER_ID.getValue(rs));
                 if(m!=null && m.getRoles().contains(mRole))
-                    g.getController().removeSingleRoleFromMember(m, mRole).reason("Temporary Mute Completed").queue();
+                    g.removeRoleFromMember(m, mRole).reason("Temporary Mute Completed").queue();
                 rs.deleteRow();
             }
         });

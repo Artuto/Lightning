@@ -16,15 +16,20 @@
 package com.jagrosh.vortex.logging;
 
 import com.jagrosh.vortex.utils.FixedCache;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.entities.Message.Attachment;
 
 /**
  *
@@ -52,11 +57,11 @@ public class MessageCache
     public List<CachedMessage> getMessages(Guild guild, Predicate<CachedMessage> predicate)
     {
         if(!cache.containsKey(guild.getIdLong()))
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         return cache.get(guild.getIdLong()).getValues().stream().filter(predicate).collect(Collectors.toList());
     }
     
-    public class CachedMessage implements ISnowflake
+    public static class CachedMessage implements ISnowflake
     {
         private final String content, username, discriminator;
         private final long id, author, channel, guild;
@@ -70,7 +75,7 @@ public class MessageCache
             username = message.getAuthor().getName();
             discriminator = message.getAuthor().getDiscriminator();
             channel = message.getChannel().getIdLong();
-            guild = message.getGuild()==null ? 0L : message.getGuild().getIdLong();
+            guild = message.isFromType(ChannelType.TEXT) ? 0L : message.getGuild().getIdLong();
             attachments = message.getAttachments();
         }
         
@@ -117,11 +122,6 @@ public class MessageCache
         public long getTextChannelId()
         {
             return channel;
-        }
-        
-        public TextChannel getTextChannel(Guild guild)
-        {
-            return guild.getTextChannelById(channel);
         }
         
         public Guild getGuild(JDA jda)

@@ -20,13 +20,13 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.utils.FormatUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDAInfo;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.Permission;
+
 import java.awt.Color;
-import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDAInfo;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.Permission;
 
 /**
  *
@@ -45,7 +45,8 @@ public class AboutCmd extends Command
     @Override
     protected void execute(CommandEvent event)
     {
-        ShardManager sm = event.getJDA().asBot().getShardManager();
+        //ShardManager sm = event.getJDA().asBot().getShardManager();
+        JDA sm = event.getJDA();
         event.reply(new MessageBuilder()
                 .setContent(Constants.VORTEX_EMOJI + " **All about Vortex** " + Constants.VORTEX_EMOJI)
                 .setEmbed(new EmbedBuilder()
@@ -54,8 +55,8 @@ public class AboutCmd extends Command
                                 + "I was written in Java by **jagrosh**#4824 using [JDA](" + JDAInfo.GITHUB + ") and [JDA-Utilities](" + JDAUtilitiesInfo.GITHUB + ")\n"
                                 + "Type `" + event.getClient().getPrefix() + event.getClient().getHelpWord() + "` for help and information.\n\n"
                                 + FormatUtil.helpLinks(event))
-                        .addField("Stats", sm.getShardsTotal()+ " Shards\n" + sm.getGuildCache().size() + " Servers", true)
-                        .addField("", sm.getUserCache().size() + " Users\n" + Math.round(sm.getAveragePing()) + "ms Avg Ping", true)
+                        .addField("Stats", /*sm.getShardsTotal()+ " Shards\n" + */sm.getGuildCache().size() + " Servers", true)
+                        .addField("", sm.getUserCache().size() + " Users\n" + Math.round(sm.getGatewayPing()) + "ms Ping", true)
                         .addField("", sm.getTextChannelCache().size() + " Text Channels\n" + sm.getVoiceChannelCache().size() + " Voice Channels", true)
                         .setFooter("Last restart", null)
                         .setTimestamp(event.getClient().getStartTime())
