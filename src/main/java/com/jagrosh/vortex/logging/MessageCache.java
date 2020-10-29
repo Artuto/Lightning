@@ -75,7 +75,7 @@ public class MessageCache
             username = message.getAuthor().getName();
             discriminator = message.getAuthor().getDiscriminator();
             channel = message.getChannel().getIdLong();
-            guild = message.isFromType(ChannelType.TEXT) ? 0L : message.getGuild().getIdLong();
+            guild = message.isFromType(ChannelType.TEXT) ? message.getGuild().getIdLong() : 0L;
             attachments = message.getAttachments();
         }
         
