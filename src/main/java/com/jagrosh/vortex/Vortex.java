@@ -94,6 +94,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
+import xyz.rc24.vortiix.commands.other.MakeAClownCmd;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -204,6 +205,9 @@ public class Vortex
                             new ExportCmd(this),
                             new InvitepruneCmd(this),
                             new LookupCmd(this),
+
+                            // RiiSpecial
+                            new MakeAClownCmd(),
 
                             // Owner
                             new EvalCmd(this),
