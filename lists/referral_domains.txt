@@ -1,4 +1,4 @@
-﻿// Referral Domain List
+// Referral Domain List
 // This list contains referral sites
 
 // IP Loggers
@@ -142,6 +142,7 @@ steamreward.com
 steamspecial.com
 steamsummer.com
 streamcommunnitly.com
+uni-claim.io
 whatsappx.com
 
 // Deceptive Unicode Links
