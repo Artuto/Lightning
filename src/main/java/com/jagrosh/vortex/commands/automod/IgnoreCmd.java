@@ -8,13 +8,14 @@ package com.jagrosh.vortex.commands.automod;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
-import java.util.List;
+import com.jagrosh.vortex.Vortex;
+import com.jagrosh.vortex.utils.FormatUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
-import com.jagrosh.vortex.Vortex;
-import com.jagrosh.vortex.utils.FormatUtil;
+
+import java.util.List;
 
 /**
  *
@@ -60,7 +61,7 @@ public class IgnoreCmd extends Command
                     builder.append("\n").append(r.getAsMention()).append(" [elevated perms]");
             });
             channels.forEach(c -> builder.append("\n").append(c.getAsMention()));
-            ebuilder.setDescription(builder.length() > 2045 ? builder.substring(0, 2048) + "..." : builder.toString());
+            ebuilder.setDescription(builder.length() > 2045 ? builder.substring(0, 2045) + "..." : builder.toString());
             event.reply(ebuilder.build());
             return;
         }
