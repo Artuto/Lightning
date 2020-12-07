@@ -17,27 +17,29 @@ package com.jagrosh.vortex.utils;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.List;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 import com.jagrosh.vortex.Constants;
-import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.logging.MessageCache.CachedMessage;
-import java.awt.Color;
-import java.util.Collections;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.VoiceChannel;
+
+import java.awt.Color;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author John Grosh (jagrosh)
  */
+@SuppressWarnings("unused")
 public class FormatUtil {
     
     private final static String MULTIPLE_FOUND = "**Multiple %s found matching \"%s\":**";
@@ -56,14 +58,14 @@ public class FormatUtil {
     {
         StringBuilder sb = new StringBuilder(m.getContentRaw());
         m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
-        return sb.length()>2048 ? sb.toString().substring(0, 2040) : sb.toString();
+        return sb.length()>2048 ? sb.substring(0, 2040) : sb.toString();
     }
     
     public static String formatMessage(CachedMessage m)
     {
         StringBuilder sb = new StringBuilder(m.getContentRaw());
         m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
-        return sb.length()>2048 ? sb.toString().substring(0, 2040) : sb.toString();
+        return sb.length()>2048 ? sb.substring(0, 2040) : sb.toString();
     }
     
     public static String formatFullUserId(long userId)
@@ -105,6 +107,7 @@ public class FormatUtil {
         return sb.toString();
     }
     
+    @SuppressWarnings("unchecked")
     public static <T> String join(String delimiter, Function<T,String> function, T... items)
     {
         if(items==null || items.length==0)
@@ -251,16 +254,16 @@ public class FormatUtil {
         return str;
     }
     
-    public static Message formatHelp(CommandEvent event, Vortex vortex)
+    public static Message formatHelp(CommandEvent event)
     {
         EmbedBuilder builder = new EmbedBuilder()
-            .setColor(event.getGuild()==null ? Color.LIGHT_GRAY : event.getSelfMember().getColor());
+            .setColor(event.isFromType(ChannelType.PRIVATE) ? Color.LIGHT_GRAY : event.getSelfMember().getColor());
         
         List<Command> commandsInCategory;
         String content;
         if(event.getArgs().isEmpty())
         {
-            commandsInCategory = Collections.EMPTY_LIST;
+            commandsInCategory = Collections.emptyList();
             content = event.getClient().getSuccess()+" **"+event.getSelfUser().getName()+"** Commands Categories:";
         }
         else

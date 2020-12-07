@@ -217,7 +217,7 @@ public class Vortex
                             new ReloadCmd(this)
                             //new TransferCmd(this)
                         )
-                        .setHelpConsumer(event -> event.replyInDm(FormatUtil.formatHelp(event, this), m -> 
+                        .setHelpConsumer(event -> event.replyInDm(FormatUtil.formatHelp(event), m ->
                         {
                             if(event.isFromType(ChannelType.TEXT))
                                 try
