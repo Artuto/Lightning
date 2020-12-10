@@ -21,8 +21,10 @@ import com.jagrosh.jdautilities.command.CommandListener;
 import com.jagrosh.vortex.utils.FormatUtil;
 import com.jagrosh.vortex.utils.Usage;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.rc24.vortiix.Vortiix;
 
 /**
  *
@@ -32,7 +34,13 @@ public class CommandExceptionListener implements CommandListener
 {
     private final Logger log = LoggerFactory.getLogger("Command");
     private final Usage usage = new Usage();
-    
+    private final Vortiix vortiix;
+
+    public CommandExceptionListener(Vortiix vortiix)
+    {
+        this.vortiix = vortiix;
+    }
+
     @Override
     public void onCommandException(CommandEvent event, Command command, Throwable throwable)
     {
@@ -66,7 +74,17 @@ public class CommandExceptionListener implements CommandListener
         if(event.isFromType(ChannelType.TEXT))
             usage.increment(event.getGuild().getIdLong());
     }
-    
+
+    // Vortiix - ModMail
+    @Override
+    public void onNonCommandMessage(MessageReceivedEvent event)
+    {
+        if(!(event.isFromType(ChannelType.PRIVATE)))
+            return;
+
+        vortiix.getModMail().onMessage(event);
+    }
+
     public Usage getUsage()
     {
         return usage;

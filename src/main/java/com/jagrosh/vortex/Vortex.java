@@ -94,6 +94,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
+import xyz.rc24.vortiix.Vortiix;
 import xyz.rc24.vortiix.commands.other.MakeAClownCmd;
 
 import java.util.concurrent.Executors;
@@ -117,6 +118,7 @@ public class Vortex
     private final WebhookClient logwebhook;
     private final AutoMod automod;
     private final StrikeHandler strikehandler;
+    private final Vortiix vortiix;
 
     public Vortex() throws Exception
     {
@@ -134,6 +136,7 @@ public class Vortex
         logwebhook = new WebhookClientBuilder(config.getString("webhook-url")).build();
         automod = new AutoMod(this, config);
         strikehandler = new StrikeHandler(this);
+        this.vortiix = new Vortiix();
 
         CommandClient client = new CommandClientBuilder()
                         .setPrefix(Constants.PREFIX)
@@ -141,7 +144,7 @@ public class Vortex
                         .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
                         .setLinkedCacheSize(0)
                         .setGuildSettingsManager(database.settings)
-                        .setListener(new CommandExceptionListener())
+                        .setListener(new CommandExceptionListener(vortiix))
                         .setScheduleExecutor(threadpool)
                         .setShutdownAutomatically(false)
                         .addCommands(
@@ -297,7 +300,12 @@ public class Vortex
     {
         return strikehandler;
     }
-    
+
+    public Vortiix getVortiix()
+    {
+        return vortiix;
+    }
+
     /**
      * @param args the command line arguments
      * @throws java.lang.Exception if an error occurred

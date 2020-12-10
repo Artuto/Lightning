@@ -57,15 +57,29 @@ public class FormatUtil {
     public static String formatMessage(Message m)
     {
         StringBuilder sb = new StringBuilder(m.getContentRaw());
-        m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
+        sb.append(formatAttachments(m));
         return sb.length()>2048 ? sb.substring(0, 2040) : sb.toString();
     }
     
     public static String formatMessage(CachedMessage m)
     {
         StringBuilder sb = new StringBuilder(m.getContentRaw());
-        m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
+        sb.append(formatAttachments(m));
         return sb.length()>2048 ? sb.substring(0, 2040) : sb.toString();
+    }
+
+    public static String formatAttachments(Message m)
+    {
+        StringBuilder sb = new StringBuilder();
+        m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
+        return sb.toString();
+    }
+
+    public static String formatAttachments(CachedMessage m)
+    {
+        StringBuilder sb = new StringBuilder();
+        m.getAttachments().forEach(att -> sb.append("\n").append(att.getUrl()));
+        return sb.toString();
     }
     
     public static String formatFullUserId(long userId)
