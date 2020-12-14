@@ -37,6 +37,16 @@ public class ModMail
         if(!(isOnGuild(author)))
             return;
 
+        if(COOLDOWN > 0)
+        {
+            String key = genKey(author.getId());
+            int remaining = vortex.getClient().getRemainingCooldown(key);
+            if(remaining > 0)
+                return;
+            else
+                vortex.getClient().applyCooldown(key, COOLDOWN);
+        }
+
         MessageEmbed embed = new EmbedBuilder()
                 .setAuthor(format("%#s (ID: %s)", author, author.getId()), null, author.getEffectiveAvatarUrl())
                 .setDescription(message.getContentRaw())
@@ -84,10 +94,17 @@ public class ModMail
         return author.getMutualGuilds().stream().anyMatch(guild -> guild.getId().equals(RC24_ID));
     }
 
+    private String genKey(String id)
+    {
+        return "modmail|U:" + id;
+    }
+
+    private static final int COOLDOWN;
     private static final long CHANNEL;
 
     static
     {
+        COOLDOWN = Integer.getInteger("vortiix.modmail.cooldown", 5);
         CHANNEL = Long.getLong("vortiix.modmail.channel", 217711478831185920L);
     }
 }
