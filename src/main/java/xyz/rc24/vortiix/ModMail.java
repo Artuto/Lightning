@@ -13,6 +13,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.jagrosh.vortex.Constants.ERROR;
 import static com.jagrosh.vortex.Constants.RC24_ID;
 import static com.jagrosh.vortex.Constants.SUCCESS;
@@ -21,11 +24,13 @@ import static java.lang.String.format;
 public class ModMail
 {
     private final Logger logger;
+    private final Map<Long, Integer> uses;
     private final Vortex vortex;
 
     public ModMail(Vortex vortex)
     {
         this.logger = LoggerFactory.getLogger(ModMail.class);
+        this.uses = new HashMap<>();
         this.vortex = vortex;
     }
 
@@ -37,14 +42,31 @@ public class ModMail
         if(!(isOnGuild(author)))
             return;
 
+        // Cooldown check
         if(COOLDOWN > 0)
         {
             String key = genKey(author.getId());
+            int cooldown = COOLDOWN;
             int remaining = vortex.getClient().getRemainingCooldown(key);
+            int uses = this.uses.getOrDefault(author.getIdLong(), 0);
+
             if(remaining > 0)
+            {
+                if(uses >= 3)
+                    vortex.getClient().applyCooldown(key, cooldown * 2);
                 return;
+            }
             else
-                vortex.getClient().applyCooldown(key, COOLDOWN);
+            {
+                vortex.getClient().applyCooldown(key, cooldown);
+                if(uses < 3)
+                {
+                    uses++;
+                    this.uses.put(author.getIdLong(), uses);
+                }
+                else
+                    this.uses.remove(author.getIdLong());
+            }
         }
 
         MessageEmbed embed = new EmbedBuilder()
