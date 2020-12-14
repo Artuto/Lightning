@@ -1,4 +1,4 @@
-﻿// Copypastas
+// Copypastas
 // Bits of text that tend to be copied and pasted
 
 // False Discord PSA
