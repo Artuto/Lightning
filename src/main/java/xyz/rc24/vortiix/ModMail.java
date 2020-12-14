@@ -1,7 +1,10 @@
 package xyz.rc24.vortiix;
 
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.utils.FormatUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -18,10 +21,12 @@ import static java.lang.String.format;
 public class ModMail
 {
     private final Logger logger;
+    private final Vortex vortex;
 
-    public ModMail()
+    public ModMail(Vortex vortex)
     {
         this.logger = LoggerFactory.getLogger(ModMail.class);
+        this.vortex = vortex;
     }
 
     public void onMessage(MessageReceivedEvent event)
@@ -44,6 +49,14 @@ public class ModMail
         send(event, embed);
     }
 
+    public void reply(CommandEvent event, Member user, String message)
+    {
+        user.getUser().openPrivateChannel()
+                .flatMap(pc -> pc.sendMessage(message))
+                .queue(s -> event.reactSuccess(), e -> event.replyError("Failed to send the reply to " +
+                        user.getUser().getAsTag() + ", they probably have mutual DMs disabled"));
+    }
+
     private void send(MessageReceivedEvent event, MessageEmbed embed)
     {
         TextChannel channel = event.getJDA().getTextChannelById(CHANNEL);
@@ -56,11 +69,12 @@ public class ModMail
             return;
         }
 
-        channel.sendMessage(embed).queue(s -> event.getMessage().addReaction(SUCCESS).queue(null, e2 -> {}),
-                e ->
+        channel.sendMessage(embed)
+                .flatMap(s -> event.getMessage().addReaction(SUCCESS))
+                .queue(null, e ->
                 {
                     event.getPrivateChannel().sendMessage(ERROR + " An error occurred when sending the message." +
-                            " Contact an Admin directly and mention this error.").queue(null, e3 -> {});
+                            " Contact an Admin directly and mention this error.").queue(null, e2 -> {});
                     logger.error("Failed to send ModMail message:", e);
                 });
     }
@@ -70,5 +84,10 @@ public class ModMail
         return author.getMutualGuilds().stream().anyMatch(guild -> guild.getId().equals(RC24_ID));
     }
 
-    private final long CHANNEL = 267732619771379713L; //217711478831185920L;
+    private static final long CHANNEL;
+
+    static
+    {
+        CHANNEL = Long.getLong("vortiix.modmail.channel", 217711478831185920L);
+    }
 }

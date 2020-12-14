@@ -95,6 +95,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import xyz.rc24.vortiix.Vortiix;
+import xyz.rc24.vortiix.commands.moderation.ModReplyCmd;
 import xyz.rc24.vortiix.commands.other.MakeAClownCmd;
 
 import java.util.concurrent.Executors;
@@ -112,6 +113,7 @@ public class Vortex
     private final Database database;
     private final TextUploader uploader;
     private final JDA jda;
+    private final CommandClient client;
     private final ModLogger modlog;
     private final BasicLogger basiclog;
     private final MessageCache messages;
@@ -136,9 +138,9 @@ public class Vortex
         logwebhook = new WebhookClientBuilder(config.getString("webhook-url")).build();
         automod = new AutoMod(this, config);
         strikehandler = new StrikeHandler(this);
-        this.vortiix = new Vortiix();
+        this.vortiix = new Vortiix(this);
 
-        CommandClient client = new CommandClientBuilder()
+        this.client = new CommandClientBuilder()
                         .setPrefix(Constants.PREFIX)
                         .setOwnerId(Constants.OWNER_ID)
                         .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
@@ -172,6 +174,7 @@ public class Vortex
                             new PardonCmd(this),
                             new CheckCmd(this),
                             new ReasonCmd(this),
+                            new ModReplyCmd(this),
 
                             // Settings
                             new SetupCmd(this),
@@ -270,7 +273,12 @@ public class Vortex
     {
         return jda;
     }
-    
+
+    public CommandClient getClient()
+    {
+        return client;
+    }
+
     public ModLogger getModLogger()
     {
         return modlog;
