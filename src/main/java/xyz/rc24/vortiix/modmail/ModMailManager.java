@@ -82,7 +82,8 @@ public class ModMailManager
 
     public void reply(CommandEvent event, Member user, String message)
     {
-        user.getUser().openPrivateChannel()
+        vortex.getVortiix().getModMail().getJDA().retrieveUserById(user.getId())
+                .flatMap(User::openPrivateChannel)
                 .flatMap(pc -> pc.sendMessage(message))
                 .queue(s -> event.reactSuccess(), e -> event.replyError("Failed to send the reply to " +
                         user.getUser().getAsTag() + ", they probably have mutual DMs disabled"));

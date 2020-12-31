@@ -2,6 +2,7 @@ package xyz.rc24.vortiix.modmail;
 
 import com.jagrosh.vortex.Vortex;
 import com.typesafe.config.Config;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.User;
@@ -22,6 +23,7 @@ public class ModMail extends ListenerAdapter
     private final Logger logger;
     private final Vortex vortex;
 
+    private JDA jda;
     private ModMailManager manager;
 
     public ModMail(Vortex vortex, Config config)
@@ -35,13 +37,13 @@ public class ModMail extends ListenerAdapter
 
         try
         {
-            JDABuilder.createLight(token, DIRECT_MESSAGES, DIRECT_MESSAGE_TYPING)
+            this.jda = JDABuilder.createLight(token, DIRECT_MESSAGES, DIRECT_MESSAGE_TYPING)
                     .setActivity(Activity.playing("DM me to send a message to the mods"))
                     .addEventListeners(this)
                     .setRawEventsEnabled(true)
-                    .build();
+                    .build().awaitReady();
         }
-        catch(LoginException e)
+        catch(LoginException | InterruptedException e)
         {
             logger.error("Failed to start ModMail:", e);
             return;
@@ -80,6 +82,11 @@ public class ModMail extends ListenerAdapter
                         "If you need help go to our support channel (<#288361557044494337>) and ask there.\n\n" +
                         "Misuse of the Mod Mail will be punished at the moderation's discretion."))
                 .queue(s -> vortex.getClient().applyCooldown(key, 259200), e -> {});
+    }
+
+    public JDA getJDA()
+    {
+        return jda;
     }
 
     public ModMailManager getManager()
