@@ -51,7 +51,8 @@ public class ModReplyCmd extends ModCommand
                 return;
             }
 
-            vortex.getVortiix().getModMail().reply(event, member, "Staff reply: " + args.reason.trim());
+            vortex.getVortiix().getModMail().getManager().reply(event, member,
+                    "Staff reply: " + args.reason.trim());
         }
     }
 }

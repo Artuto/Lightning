@@ -138,7 +138,7 @@ public class Vortex
         logwebhook = new WebhookClientBuilder(config.getString("webhook-url")).build();
         automod = new AutoMod(this, config);
         strikehandler = new StrikeHandler(this);
-        this.vortiix = new Vortiix(this);
+        this.vortiix = new Vortiix(this, config);
 
         this.client = new CommandClientBuilder()
                         .setPrefix(Constants.PREFIX)
@@ -146,7 +146,7 @@ public class Vortex
                         .setEmojis(Constants.SUCCESS, Constants.WARNING, Constants.ERROR)
                         .setLinkedCacheSize(0)
                         .setGuildSettingsManager(database.settings)
-                        .setListener(new CommandExceptionListener(vortiix))
+                        .setListener(new CommandExceptionListener())
                         .setScheduleExecutor(threadpool)
                         .setShutdownAutomatically(false)
                         .addCommands(

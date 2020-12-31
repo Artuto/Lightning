@@ -1,4 +1,4 @@
-package xyz.rc24.vortiix;
+package xyz.rc24.vortiix.modmail;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.Vortex;
@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,29 +17,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.jagrosh.vortex.Constants.ERROR;
-import static com.jagrosh.vortex.Constants.RC24_ID;
 import static com.jagrosh.vortex.Constants.SUCCESS;
 import static java.lang.String.format;
 
-public class ModMail
+public class ModMailManager
 {
     private final Logger logger;
     private final Map<Long, Integer> uses;
     private final Vortex vortex;
 
-    public ModMail(Vortex vortex)
+    public ModMailManager(Vortex vortex)
     {
         this.logger = LoggerFactory.getLogger(ModMail.class);
         this.uses = new HashMap<>();
         this.vortex = vortex;
     }
 
-    public void onMessage(MessageReceivedEvent event)
+    public void onMessage(PrivateMessageReceivedEvent event)
     {
         Message message = event.getMessage();
         User author = event.getAuthor();
 
-        if(!(isOnGuild(author)))
+        if(author.isBot())
             return;
 
         // Cooldown check
@@ -72,7 +71,7 @@ public class ModMail
         MessageEmbed embed = new EmbedBuilder()
                 .setAuthor(format("%#s (ID: %s)", author, author.getId()), null, author.getEffectiveAvatarUrl())
                 .setDescription(message.getContentRaw())
-                .setTitle("Mail received: " + message.getId(), message.getJumpUrl())
+                .setTitle("Mail received:", message.getJumpUrl())
                 .setFooter("Submitted")
                 .setTimestamp(message.getTimeCreated())
                 .addField("Attachments:", FormatUtil.formatAttachments(message), false)
@@ -89,13 +88,13 @@ public class ModMail
                         user.getUser().getAsTag() + ", they probably have mutual DMs disabled"));
     }
 
-    private void send(MessageReceivedEvent event, MessageEmbed embed)
+    private void send(PrivateMessageReceivedEvent event, MessageEmbed embed)
     {
         TextChannel channel = event.getJDA().getTextChannelById(CHANNEL);
 
         if(channel == null || !(channel.canTalk()))
         {
-            event.getPrivateChannel().sendMessage(ERROR + " I was not able to send the message to the mods." +
+            event.getChannel().sendMessage(ERROR + " I was not able to send the message to the mods." +
                     " Contact an Admin directly and mention this error.").queue(null, e -> {});
             logger.error("I cannot find the ModMail channel or I don't have permission to talk on it");
             return;
@@ -105,20 +104,20 @@ public class ModMail
                 .flatMap(s -> event.getMessage().addReaction(SUCCESS))
                 .queue(null, e ->
                 {
-                    event.getPrivateChannel().sendMessage(ERROR + " An error occurred when sending the message." +
+                    event.getChannel().sendMessage(ERROR + " An error occurred when sending the message." +
                             " Contact an Admin directly and mention this error.").queue(null, e2 -> {});
                     logger.error("Failed to send ModMail message:", e);
                 });
     }
 
-    private boolean isOnGuild(User author)
-    {
-        return author.getMutualGuilds().stream().anyMatch(guild -> guild.getId().equals(RC24_ID));
-    }
-
     private String genKey(String id)
     {
-        return "modmail|U:" + id;
+        return genKey(id, "modmail");
+    }
+
+    String genKey(String id, String type)
+    {
+        return type + "|U:" + id;
     }
 
     private static final int COOLDOWN;
@@ -126,7 +125,7 @@ public class ModMail
 
     static
     {
-        COOLDOWN = Integer.getInteger("vortiix.modmail.cooldown", 5);
+        COOLDOWN = Integer.getInteger("vortiix.modmail.cooldown", 2);
         CHANNEL = Long.getLong("vortiix.modmail.channel", 217711478831185920L);
     }
 }
