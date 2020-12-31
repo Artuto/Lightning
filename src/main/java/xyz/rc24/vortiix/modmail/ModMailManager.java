@@ -1,6 +1,7 @@
 package xyz.rc24.vortiix.modmail;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.utils.FormatUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.jagrosh.vortex.Constants.ERROR;
-import static com.jagrosh.vortex.Constants.SUCCESS;
 import static java.lang.String.format;
 
 public class ModMailManager
@@ -101,7 +101,7 @@ public class ModMailManager
         }
 
         channel.sendMessage(embed)
-                .flatMap(s -> event.getMessage().addReaction(SUCCESS))
+                .flatMap(s -> event.getMessage().addReaction(Constants.SUCCESS_REACTION))
                 .queue(null, e ->
                 {
                     event.getChannel().sendMessage(ERROR + " An error occurred when sending the message." +

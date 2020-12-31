@@ -32,6 +32,7 @@ public class Constants
     public final static String ERROR           = "<:vError:794045863818952734>";
     public final static String LOADING         = "<a:typing:393848431413559296>";
     public final static String HELP_REACTION   = SUCCESS.replaceAll("<a?:(.+):(\\d+)>", "$1:$2");
+    public final static String SUCCESS_REACTION= SUCCESS.replaceAll("<a?:(.+):(\\d+)>", "$1:$2");
     public final static String ERROR_REACTION  = ERROR.replaceAll("<a?:(.+):(\\d+)>", "$1:$2");
     public final static String VORTEX_EMOJI    = "<:Vortex:386971287282515970>";
     public final static int DEFAULT_CACHE_SIZE = 8000;
