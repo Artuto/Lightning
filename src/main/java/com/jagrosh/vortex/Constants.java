@@ -27,9 +27,9 @@ public class Constants
 {
     public final static OffsetDateTime STARTUP = OffsetDateTime.now();
     public final static String PREFIX          = System.getProperty("vortiix.prefix", ">>");
-    public final static String SUCCESS         = "✅";
-    public final static String WARNING         = "⚠";
-    public final static String ERROR           = "❌";
+    public final static String SUCCESS         = "<:vSuccess:794045863609368607>";
+    public final static String WARNING         = "<:vWarn:794045863924072498>";
+    public final static String ERROR           = "<:vError:794045863818952734>";
     public final static String LOADING         = "<a:typing:393848431413559296>";
     public final static String HELP_REACTION   = SUCCESS.replaceAll("<a?:(.+):(\\d+)>", "$1:$2");
     public final static String ERROR_REACTION  = ERROR.replaceAll("<a?:(.+):(\\d+)>", "$1:$2");
