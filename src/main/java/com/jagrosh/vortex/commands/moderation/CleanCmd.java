@@ -15,23 +15,24 @@
  */
 package com.jagrosh.vortex.commands.moderation;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.commands.CommandExceptionListener.CommandErrorException;
 import com.jagrosh.vortex.commands.CommandExceptionListener.CommandWarningException;
 import com.jagrosh.vortex.commands.ModCommand;
-import java.util.LinkedList;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageHistory;
 import com.jagrosh.vortex.utils.LogUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.EmbedType;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.TextChannel;
+
+import java.time.OffsetDateTime;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -111,7 +112,7 @@ public class CleanCmd extends ModCommand
         parameters = parameters.replaceAll(ID_PATTERN.pattern(), " ");
         
         m = NUM_PATTERN.matcher(parameters);
-        if(m.find())
+        if(m.matches())
             num = Integer.parseInt(m.group(1));
         parameters = parameters.replaceAll(NUM_PATTERN.pattern(), " ").toLowerCase();
         
