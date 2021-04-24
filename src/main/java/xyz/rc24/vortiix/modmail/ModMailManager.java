@@ -1,36 +1,36 @@
 package xyz.rc24.vortiix.modmail;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.vortex.Constants;
-import com.jagrosh.vortex.Vortex;
-import com.jagrosh.vortex.utils.FormatUtil;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.jagrosh.vortex.Constants.ERROR;
-import static java.lang.String.format;
+import static com.jagrosh.vortex.Constants.SUCCESS;
+import static com.jagrosh.vortex.Constants.SUCCESS_REACTION;
 
 public class ModMailManager
 {
     private final Logger logger;
-    private final Map<Long, Integer> uses;
-    private final Vortex vortex;
+    private final Map<Long, ModMailThread> threads;
+    private final ModMail modMail;
 
-    public ModMailManager(Vortex vortex)
+    public ModMailManager(ModMail modMail)
     {
         this.logger = LoggerFactory.getLogger(ModMail.class);
-        this.uses = new HashMap<>();
-        this.vortex = vortex;
+        this.threads = new HashMap<>();
+        this.modMail = modMail;
     }
 
     public void onMessage(PrivateMessageReceivedEvent event)
@@ -41,92 +41,94 @@ public class ModMailManager
         if(author.isBot())
             return;
 
-        // Cooldown check
-        if(COOLDOWN > 0)
+        ModMailThread thread = getThreads().get(author.getIdLong());
+        if(thread == null)
         {
-            String key = genKey(author.getId());
-            int cooldown = COOLDOWN;
-            int remaining = vortex.getClient().getRemainingCooldown(key);
-            int uses = this.uses.getOrDefault(author.getIdLong(), 0);
+            event.getChannel().sendMessage(ModMail.WARNING).queue(warningMessage ->
+            {
+                warningMessage.addReaction(SUCCESS_REACTION).queueAfter(3, TimeUnit.SECONDS);
+                modMail.getWaiter().waitForEvent(PrivateMessageReactionAddEvent.class,
+                        this::checkReaction, this::openThread);
 
-            if(remaining > 0)
-            {
-                if(uses >= 3)
-                    vortex.getClient().applyCooldown(key, cooldown * 2);
-                return;
-            }
-            else
-            {
-                vortex.getClient().applyCooldown(key, cooldown);
-                if(uses < 3)
-                {
-                    uses++;
-                    this.uses.put(author.getIdLong(), uses);
-                }
-                else
-                    this.uses.remove(author.getIdLong());
-            }
+                ModMailThread createdThread = new ModMailThread(author, message, warningMessage);
+                getThreads().put(author.getIdLong(), createdThread);
+            });
+
+            return;
+        }
+        else if(!(thread.isActive()))
+        {
+            String contentDisplay = message.getContentDisplay();
+            if(!(contentDisplay.isEmpty() || contentDisplay.length() <= 2))
+                thread.getQueuedMessages().incrementAndGet();
+            return;
         }
 
-        MessageEmbed embed = new EmbedBuilder()
-                .setAuthor(format("%#s (ID: %s)", author, author.getId()), null, author.getEffectiveAvatarUrl())
-                .setDescription(message.getContentRaw())
-                .setTitle("Mail received:", message.getJumpUrl())
-                .setFooter("Submitted")
-                .setTimestamp(message.getTimeCreated())
-                .addField("Attachments:", FormatUtil.formatAttachments(message), false)
-                .build();
-
-        send(event, embed);
+        send(event, thread.embed(event.getMessage()));
     }
 
-    public void reply(CommandEvent event, Member user, String message)
+    void send(PrivateMessageReceivedEvent event, MessageEmbed embed)
     {
-        vortex.getVortiix().getModMail().getJDA().retrieveUserById(user.getId())
-                .flatMap(User::openPrivateChannel)
-                .flatMap(pc -> pc.sendMessage(message))
-                .queue(s -> event.reactSuccess(), e -> event.replyError("Failed to send the reply to " +
-                        user.getUser().getAsTag() + ", they probably have mutual DMs disabled"));
+        send(false, event.getChannel(), embed);
     }
 
-    private void send(PrivateMessageReceivedEvent event, MessageEmbed embed)
+    void send(boolean initial, PrivateChannel pc, MessageEmbed embed)
     {
-        TextChannel channel = event.getJDA().getTextChannelById(CHANNEL);
+        TextChannel channel = pc.getJDA().getTextChannelById(CHANNEL);
 
         if(channel == null || !(channel.canTalk()))
         {
-            event.getChannel().sendMessage(ERROR + " I was not able to send the message to the mods." +
+            pc.sendMessage(ERROR + " I was not able to send the message to the mods." +
                     " Contact an Admin directly and mention this error.").queue(null, e -> {});
             logger.error("I cannot find the ModMail channel or I don't have permission to talk on it");
             return;
         }
 
-        channel.sendMessage(embed)
-                .flatMap(s -> event.getMessage().addReaction(Constants.SUCCESS_REACTION))
-                .queue(null, e ->
-                {
-                    event.getChannel().sendMessage(ERROR + " An error occurred when sending the message." +
-                            " Contact an Admin directly and mention this error.").queue(null, e2 -> {});
-                    logger.error("Failed to send ModMail message:", e);
-                });
+        RestAction<Message> action = channel.sendMessage(embed);
+        if(initial)
+            action = action.flatMap(m -> pc.sendMessage(SUCCESS + " Your message has been sent to the mods"));
+
+        action.queue(null, e ->
+        {
+            pc.sendMessage(ERROR + " An error occurred when sending the message." +
+                    " Contact an Admin directly and mention this error.").queue(null, e2 -> {});
+            logger.error("Failed to send ModMail message:", e);
+        });
     }
 
-    private String genKey(String id)
+    private void openThread(PrivateMessageReactionAddEvent event)
     {
-        return genKey(id, "modmail");
+        PrivateChannel channel = event.getChannel();
+        ModMailThread thread = getThreads().get(event.getUserIdLong());
+        thread.setActive(true);
+
+        thread.sendHistory(this, channel);
     }
 
-    String genKey(String id, String type)
+    private boolean checkReaction(PrivateMessageReactionAddEvent event)
     {
-        return type + "|U:" + id;
+        User user = event.getChannel().getUser();
+        ModMailThread thread = getThreads().get(user.getIdLong());
+
+        if(!(event.getUserIdLong() == user.getIdLong()))
+            return false;
+
+        if(!(event.getMessageIdLong() == thread.getWarningMessage()))
+            return false;
+
+        MessageReaction.ReactionEmote emote = event.getReactionEmote();
+        return emote.getAsReactionCode().equals(SUCCESS_REACTION);
     }
 
-    private static final int COOLDOWN;
+    public synchronized Map<Long, ModMailThread> getThreads()
+    {
+        return threads;
+    }
+
     private static final long CHANNEL;
 
     static
     {
-        COOLDOWN = Integer.getInteger("vortiix.modmail.cooldown", 2);
         CHANNEL = Long.getLong("vortiix.modmail.channel", 217711478831185920L);
     }
 }

@@ -6,10 +6,12 @@ import com.jagrosh.vortex.commands.ModCommand;
 import com.jagrosh.vortex.utils.ArgsUtil;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import xyz.rc24.vortiix.modmail.ModMailManager;
+import xyz.rc24.vortiix.modmail.ModMailThread;
 
 public class ModReplyCmd extends ModCommand
 {
-    private final Vortex vortex;
+    private final ModMailManager modMailManager;
 
     public ModReplyCmd(Vortex vortex)
     {
@@ -18,7 +20,7 @@ public class ModReplyCmd extends ModCommand
         this.arguments = "<user id> <your message>";
         this.help = "responds to an user that sent a Mod Mail";
         this.guildOnly = true;
-        this.vortex = vortex;
+        this.modMailManager = vortex.getVortiix().getModMail().getManager();
     }
 
     @Override
@@ -51,8 +53,8 @@ public class ModReplyCmd extends ModCommand
                 return;
             }
 
-            vortex.getVortiix().getModMail().getManager().reply(event, member,
-                    "Staff reply: " + args.reason.trim());
+            ModMailThread thread = modMailManager.getThreads().get(member.getIdLong());
+            thread.reply(event, event.getJDA(), member, "Staff reply: " + args.reason.trim());
         }
     }
 }

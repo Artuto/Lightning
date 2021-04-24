@@ -1,35 +1,33 @@
 package xyz.rc24.vortiix.modmail;
 
-import com.jagrosh.vortex.Vortex;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.jagrosh.vortex.Constants;
 import com.typesafe.config.Config;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.RawGatewayEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.DIRECT_MESSAGES;
-import static net.dv8tion.jda.api.requests.GatewayIntent.DIRECT_MESSAGE_TYPING;
+import static net.dv8tion.jda.api.requests.GatewayIntent.DIRECT_MESSAGE_REACTIONS;
 
 public class ModMail extends ListenerAdapter
 {
+    private final EventWaiter waiter;
     private final Logger logger;
-    private final Vortex vortex;
 
     private JDA jda;
     private ModMailManager manager;
 
-    public ModMail(Vortex vortex, Config config)
+    public ModMail(Config config)
     {
+        this.waiter = new EventWaiter();
         this.logger = LoggerFactory.getLogger(ModMail.class);
-        this.vortex = vortex;
 
         String token = config.getString("modmail.token");
         if(token == null || token.isEmpty())
@@ -37,10 +35,9 @@ public class ModMail extends ListenerAdapter
 
         try
         {
-            this.jda = JDABuilder.createLight(token, DIRECT_MESSAGES, DIRECT_MESSAGE_TYPING)
+            this.jda = JDABuilder.createLight(token, DIRECT_MESSAGES, DIRECT_MESSAGE_REACTIONS)
                     .setActivity(Activity.playing("DM me to send a message to the mods"))
-                    .addEventListeners(this)
-                    .setRawEventsEnabled(true)
+                    .addEventListeners(this, waiter)
                     .build().awaitReady();
         }
         catch(LoginException | InterruptedException e)
@@ -50,7 +47,7 @@ public class ModMail extends ListenerAdapter
         }
 
         logger.info("Started ModMail Bot");
-        this.manager = new ModMailManager(vortex);
+        this.manager = new ModMailManager(this);
     }
 
     @Override
@@ -59,29 +56,9 @@ public class ModMail extends ListenerAdapter
         manager.onMessage(event);
     }
 
-    @Override
-    public void onRawGateway(RawGatewayEvent event)
+    public EventWaiter getWaiter()
     {
-        if(!(event.getType().equals("TYPING_START")))
-            return;
-
-        DataObject payload = event.getPayload();
-        if(payload.hasKey("guild_id"))
-            return;
-
-        String user = payload.getString("user_id");
-        String key = manager.genKey(user, "modmailtyping");
-
-        if(vortex.getClient().getRemainingCooldown(key) > 0)
-            return;
-
-        event.getJDA().retrieveUserById(user)
-                .flatMap(User::openPrivateChannel)
-                .flatMap(pc -> pc.sendMessage("__**READ BEFORE SENDING:**__\n\n" +
-                        "Please do **not** use Mod Mail for modding or RiiConnect24 support. " +
-                        "If you need help go to our support channel (<#288361557044494337>) and ask there.\n\n" +
-                        "Misuse of the Mod Mail will be punished at the moderation's discretion."))
-                .queue(s -> vortex.getClient().applyCooldown(key, 259200), e -> {});
+        return waiter;
     }
 
     public JDA getJDA()
@@ -93,4 +70,10 @@ public class ModMail extends ListenerAdapter
     {
         return manager;
     }
+
+    static final String WARNING = "__**READ BEFORE SENDING:**__\n\n" +
+            "Please do **not** use Mod Mail for modding or RiiConnect24 support. " +
+            "If you need help go to our support channel (<#288361557044494337>) and ask there.\n" +
+            "Abuse of the Mod Mail will be punished at the moderation's discretion.\n\n" +
+            "If you agree with this react with " + Constants.SUCCESS;
 }

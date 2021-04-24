@@ -138,7 +138,7 @@ public class Vortex
         logwebhook = new WebhookClientBuilder(config.getString("webhook-url")).build();
         automod = new AutoMod(this, config);
         strikehandler = new StrikeHandler(this);
-        this.vortiix = new Vortiix(this, config);
+        this.vortiix = new Vortiix(config);
 
         this.client = new CommandClientBuilder()
                         .setPrefix(Constants.PREFIX)
