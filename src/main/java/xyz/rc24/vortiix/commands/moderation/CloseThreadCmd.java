@@ -9,16 +9,16 @@ import net.dv8tion.jda.api.entities.Member;
 import xyz.rc24.vortiix.modmail.ModMailManager;
 import xyz.rc24.vortiix.modmail.ModMailThread;
 
-public class ModReplyCmd extends ModCommand
+public class CloseThreadCmd extends ModCommand
 {
     private final ModMailManager modMailManager;
 
-    public ModReplyCmd(Vortex vortex)
+    public CloseThreadCmd(Vortex vortex)
     {
         super(vortex, Permission.BAN_MEMBERS);
-        this.name = "modreply";
-        this.arguments = "<user id> <your message>";
-        this.help = "responds to an user that sent a Mod Mail";
+        this.name = "closethread";
+        this.arguments = "<user id>";
+        this.help = "closes a user's mod mail thread";
         this.modMailManager = vortex.getVortiix().getModMail().getManager();
     }
 
@@ -52,8 +52,8 @@ public class ModReplyCmd extends ModCommand
                 return;
             }
 
-            ModMailThread thread = modMailManager.getThreads().get(member.getIdLong());
-            thread.reply(event, event.getJDA(), member, "Staff reply: " + args.reason.trim());
+            ModMailThread thread = modMailManager.getThreads().remove(member.getIdLong());
+            thread.close(event, event.getJDA(), member);
         }
     }
 }

@@ -109,6 +109,14 @@ public class ModMailThread
                         user.getUser().getAsTag() + ", they probably have mutual DMs disabled"));
     }
 
+    public void close(CommandEvent event, JDA jda, Member user)
+    {
+        jda.retrieveUserById(user.getIdLong())
+                .flatMap(User::openPrivateChannel)
+                .flatMap(pc -> pc.sendMessage("This thread has been closed by a staff member."))
+                .queue(s -> event.reactSuccess(), e -> {});
+    }
+
     private List<Message> filterMessages(List<Message> messages)
     {
         messages = new LinkedList<>(messages);

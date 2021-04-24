@@ -95,6 +95,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import xyz.rc24.vortiix.Vortiix;
+import xyz.rc24.vortiix.commands.moderation.CloseThreadCmd;
 import xyz.rc24.vortiix.commands.moderation.ModReplyCmd;
 import xyz.rc24.vortiix.commands.other.MakeAClownCmd;
 
@@ -175,6 +176,7 @@ public class Vortex
                             new CheckCmd(this),
                             new ReasonCmd(this),
                             new ModReplyCmd(this),
+                            new CloseThreadCmd(this),
 
                             // Settings
                             new SetupCmd(this),
