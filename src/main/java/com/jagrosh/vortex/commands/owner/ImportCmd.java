@@ -23,8 +23,6 @@ import com.jagrosh.vortex.utils.OtherUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
-
 /**
  *
  * @author Michaili K (mysteriouscursor+git@protonmail.com)
@@ -51,29 +49,33 @@ public class ImportCmd extends Command
             event.replyError("Attachment required");
             return;
         }
-        try
+
+        Guild g = event.getGuild();
+        Database db = vortex.getDatabase();
+        OtherUtil.downloadAttachment(event.getMessage().getAttachments().get(0), attachment ->
         {
-            Guild g = event.getGuild();
-            Database db = vortex.getDatabase();
-            ByteArrayOutputStream attachment = OtherUtil.downloadAttachment(event.getMessage().getAttachments().get(0));
-            JSONObject data = new JSONObject(attachment.toString("UTF-8"));
+            try
+            {
+                JSONObject data = new JSONObject(attachment);
 
-            db.automod.setSettingsJson(g, data.getJSONObject("automod"));
-            db.settings.setSettingsJson(g, data.getJSONObject("settings"));
-            db.ignores.setIgnoresJson(g, data.getJSONArray("ignores"));
-            db.strikes.setAllStrikesJson(g, data.getJSONObject("strikes"));
-            db.actions.setAllPunishmentsJson(g, data.getJSONObject("punishments"));
-            db.tempmutes.setAllMutesJson(g, data.getJSONObject("tempmutes"));
-            db.tempbans.setAllBansJson(g, data.getJSONObject("tempbans"));
-            db.inviteWhitelist.setWhiteListJson(g, data.getJSONArray("inviteWhitelist"));
-            db.filters.setFiltersJson(g, data.getJSONObject("filters"));
+                db.automod.setSettingsJson(g, data.getJSONObject("automod"));
+                db.settings.setSettingsJson(g, data.getJSONObject("settings"));
+                db.ignores.setIgnoresJson(g, data.getJSONArray("ignores"));
+                db.strikes.setAllStrikesJson(g, data.getJSONObject("strikes"));
+                db.actions.setAllPunishmentsJson(g, data.getJSONObject("punishments"));
+                db.tempmutes.setAllMutesJson(g, data.getJSONObject("tempmutes"));
+                db.tempbans.setAllBansJson(g, data.getJSONObject("tempbans"));
+                db.inviteWhitelist.setWhiteListJson(g, data.getJSONArray("inviteWhitelist"));
+                db.filters.setFiltersJson(g, data.getJSONObject("filters"));
+                if(data.has("usernameFilters"))
+                    db.usernameFilters.setFiltersJson(g, data.getJSONObject("usernameFilters"));
 
-            event.replySuccess("Import Complete!");
-        }
-        catch(Exception ex)
-        {
-            event.replyError("Error: "+ex+"\nat "+ex.getStackTrace()[0]);
-
-        }
+                event.replySuccess("Import Complete!");
+            }
+            catch(Exception ex)
+            {
+                event.replyError("Error: "+ex+"\nat "+ex.getStackTrace()[0]);
+            }
+        });
     }
 }

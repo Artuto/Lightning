@@ -22,12 +22,12 @@ import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +44,7 @@ public class OtherUtil
         '\u214B', '\u2018', '\u2768', '\u2769', '\u2217', '\u2722', '\u201A', '\u2013', '\u2024', '\u2044'}; // similar
     public final static String DEHOIST_JOINED = "`"+FormatUtil.join("`, `", DEHOIST_ORIGINAL)+"`";
     
-    public final static boolean dehoist(Member m, char symbol)
+    public static boolean dehoist(Member m, char symbol)
     {
         if(!m.getGuild().getSelfMember().canInteract(m))
             return false;
@@ -129,23 +129,20 @@ public class OtherUtil
         }
     }
 
-    public static ByteArrayOutputStream downloadAttachment(Message.Attachment attachment)
+    public static void downloadAttachment(Message.Attachment attachment, Consumer<String> result)
     {
-        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+        StringBuilder str = new StringBuilder();
         attachment.retrieveInputStream().thenAccept(inputStream ->
         {
-            try
+            try(inputStream)
             {
-                while(true)
-                {
-                    int result = inputStream.read();
-                    if (result == -1) break;
-                    byteArray.write(result);
-                }
+                byte[] buf = new byte[1024];
+                int count;
+                while((count = inputStream.read(buf)) > 0)
+                    str.append(new String(buf, 0, count));
             }
             catch(IOException ignored) {}
+            result.accept(str.toString());
         });
-
-        return byteArray;
     }
 }
