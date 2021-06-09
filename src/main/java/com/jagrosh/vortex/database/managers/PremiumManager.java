@@ -46,6 +46,7 @@ public class PremiumManager extends DataManager
     public static final SQLColumn<Integer> LEVEL = new IntegerColumn("LEVEL", false, 0);
     
     private final PremiumInfo NO_PREMIUM = new PremiumInfo();
+    private final PremiumInfo FOREVER = new PremiumInfo(Level.ULTRA, Instant.MAX);
     
     public PremiumManager(DatabaseConnector connector)
     {
@@ -65,7 +66,7 @@ public class PremiumManager extends DataManager
     
     public PremiumInfo getPremiumInfo(Guild guild)
     {
-        return read(selectAll(GUILD_ID.is(guild.getIdLong())), rs -> 
+        return FOREVER /*read(selectAll(GUILD_ID.is(guild.getIdLong())), rs ->
         {
             if(rs.next())
             {
@@ -73,7 +74,7 @@ public class PremiumManager extends DataManager
                     return new PremiumInfo(rs);
             }
             return NO_PREMIUM;
-        });
+        })*/;
     }
     
     public JSONObject getPremiumInfoJson(Guild guild)
@@ -186,8 +187,13 @@ public class PremiumManager extends DataManager
         
         private PremiumInfo(ResultSet rs) throws SQLException
         {
-            this.level = Level.values()[LEVEL.getValue(rs)];
-            this.until = UNTIL.getValue(rs);
+            this(Level.values()[LEVEL.getValue(rs)], UNTIL.getValue(rs));
+        }
+
+        private PremiumInfo(Level level, Instant until)
+        {
+            this.level = level;
+            this.until = until;
         }
         
         private PremiumInfo()

@@ -37,7 +37,6 @@ import com.jagrosh.vortex.commands.automod.MaxlinesCmd;
 import com.jagrosh.vortex.commands.automod.MaxmentionsCmd;
 import com.jagrosh.vortex.commands.automod.ResolvelinksCmd;
 import com.jagrosh.vortex.commands.automod.UnignoreCmd;
-import xyz.rc24.vortiix.commands.automod.UsernameFilterCmd;
 import com.jagrosh.vortex.commands.general.RoleinfoCmd;
 import com.jagrosh.vortex.commands.general.ServerinfoCmd;
 import com.jagrosh.vortex.commands.general.UserinfoCmd;
@@ -59,7 +58,6 @@ import com.jagrosh.vortex.commands.moderation.VoicemoveCmd;
 import com.jagrosh.vortex.commands.owner.DebugCmd;
 import com.jagrosh.vortex.commands.owner.EvalCmd;
 import com.jagrosh.vortex.commands.owner.ImportCmd;
-import com.jagrosh.vortex.commands.owner.PremiumCmd;
 import com.jagrosh.vortex.commands.owner.ReloadCmd;
 import com.jagrosh.vortex.commands.settings.AvatarlogCmd;
 import com.jagrosh.vortex.commands.settings.MessagelogCmd;
@@ -96,6 +94,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import xyz.rc24.vortiix.Vortiix;
+import xyz.rc24.vortiix.commands.automod.UsernameFilterCmd;
 import xyz.rc24.vortiix.commands.moderation.CloseThreadCmd;
 import xyz.rc24.vortiix.commands.moderation.ModReplyCmd;
 import xyz.rc24.vortiix.commands.other.MakeAClownCmd;
@@ -223,7 +222,7 @@ public class Vortex
                             new EvalCmd(this),
                             new DebugCmd(this),
                             new ImportCmd(this),
-                            new PremiumCmd(this),
+                            //new PremiumCmd(this),
                             new ReloadCmd(this)
                             //new TransferCmd(this)
                         )
