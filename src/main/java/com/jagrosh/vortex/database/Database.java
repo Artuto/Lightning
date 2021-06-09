@@ -17,6 +17,7 @@ package com.jagrosh.vortex.database;
 
 import com.jagrosh.easysql.DatabaseConnector;
 import com.jagrosh.vortex.database.managers.*;
+import xyz.rc24.vortiix.database.managers.UsernameFilterManager;
 
 /**
  *
@@ -35,6 +36,7 @@ public class Database extends DatabaseConnector
     public final PremiumManager premium;
     public final InviteWhitelistManager inviteWhitelist;
     public final FilterManager filters;
+    public final UsernameFilterManager usernameFilters;
     
     public Database(String host, String user, String pass) throws Exception
     {
@@ -51,6 +53,7 @@ public class Database extends DatabaseConnector
         premium = new PremiumManager(this);
         inviteWhitelist = new InviteWhitelistManager(this);
         filters = new FilterManager(this);
+        usernameFilters = new UsernameFilterManager(this);
         
         init();
     }

@@ -1,19 +1,4 @@
-/*
- * Copyright 2018 John Grosh (john.a.grosh@gmail.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package com.jagrosh.vortex.database.managers;
+package xyz.rc24.vortiix.database.managers;
 
 import com.jagrosh.easysql.DataManager;
 import com.jagrosh.easysql.DatabaseConnector;
@@ -24,34 +9,31 @@ import com.jagrosh.easysql.columns.StringColumn;
 import com.jagrosh.vortex.Action;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.automod.Filter;
+import com.jagrosh.vortex.database.managers.GenericFilterManager;
 import com.jagrosh.vortex.utils.FixedCache;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author John Grosh (john.a.grosh@gmail.com)
- */
-public class FilterManager extends DataManager implements GenericFilterManager
+public class UsernameFilterManager extends DataManager implements GenericFilterManager
 {
     private final static int MAX_FILTERS = 15;
-    private final static String SETTINGS_TITLE = "\uD83D\uDEAF Filters"; // 🚯
-    
+    private final static String SETTINGS_TITLE = "\uD83D\uDEAF Username Filters"; // 🚯
+
     public final static SQLColumn<Long> GUILD_ID = new LongColumn("GUILD_ID",false,0L);
     public final static SQLColumn<String> SHORTNAME = new StringColumn("SHORTNAME",false,"",Filter.MAX_NAME_LENGTH);
     public final static SQLColumn<String> NAME = new StringColumn("NAME",false,"",Filter.MAX_NAME_LENGTH);
     public final static SQLColumn<Integer> STRIKES = new IntegerColumn("STRIKES", false, 0);
     public final static SQLColumn<String> CONTENT = new StringColumn("CONTENT", false, "", Filter.MAX_CONTENT_LENGTH);
-    
+
     private final FixedCache<Long, List<Filter>> cache = new FixedCache<>(Constants.DEFAULT_CACHE_SIZE);
-    
-    public FilterManager(DatabaseConnector connector)
+
+    public UsernameFilterManager(DatabaseConnector connector)
     {
-        super(connector, "FILTERS");
+        super(connector, "USERNAME_FILTERS");
     }
 
     @Override
@@ -65,7 +47,7 @@ public class FilterManager extends DataManager implements GenericFilterManager
     {
         if(cache.contains(guild.getIdLong()))
             return cache.get(guild.getIdLong());
-        List<Filter> filters = read(selectAll(GUILD_ID.is(guild.getId())), rs -> 
+        List<Filter> filters = read(selectAll(GUILD_ID.is(guild.getId())), rs ->
         {
             List<Filter> list = new ArrayList<>();
             while(rs.next())
@@ -84,7 +66,7 @@ public class FilterManager extends DataManager implements GenericFilterManager
     }
 
     @Override
-    public Field getFiltersDisplay(Guild guild)
+    public MessageEmbed.Field getFiltersDisplay(Guild guild)
     {
         List<Filter> filters = getFilters(guild);
         if(filters.isEmpty())
@@ -92,7 +74,7 @@ public class FilterManager extends DataManager implements GenericFilterManager
         StringBuilder sb = new StringBuilder();
         filters.forEach(f -> sb.append("\n**").append(f.name).append("** (`").append(f.strikes).append(" ")
                 .append(Action.STRIKE.getEmoji()).append("`): ").append(f.printContentEscaped()));
-        return new Field(SETTINGS_TITLE, sb.toString().trim(), true);
+        return new MessageEmbed.Field(SETTINGS_TITLE, sb.toString().trim(), true);
     }
 
     @Override
@@ -104,7 +86,6 @@ public class FilterManager extends DataManager implements GenericFilterManager
         return obj;
     }
 
-    @Override
     public void setFiltersJson(Guild guild, JSONObject json)
     {
         // remove all filters first
@@ -126,10 +107,11 @@ public class FilterManager extends DataManager implements GenericFilterManager
         String shortname = shortnameOf(filter.name);
         if(shortname.isEmpty())
             return false;
-        if(getFilters(guild).size() >= MAX_FILTERS)
+        List<Filter> filters = getFilters(guild);
+        if(filters.size() >= MAX_FILTERS)
             return false;
         invalidateCache(guild);
-        return readWrite(selectAll(GUILD_ID.is(guild.getId()) + " AND " + SHORTNAME.is("'"+shortname+"'")), rs -> 
+        return readWrite(selectAll(GUILD_ID.is(guild.getId()) + " AND " + SHORTNAME.is("'"+shortname+"'")), rs ->
         {
             if(rs.next())
                 return false;
@@ -151,7 +133,7 @@ public class FilterManager extends DataManager implements GenericFilterManager
         if(shortname.isEmpty())
             return null;
         invalidateCache(guild);
-        return readWrite(selectAll(GUILD_ID.is(guild.getId()) + " AND " + SHORTNAME.is("'"+shortname+"'")), rs -> 
+        return readWrite(selectAll(GUILD_ID.is(guild.getId()) + " AND " + SHORTNAME.is("'"+shortname+"'")), rs ->
         {
             if(rs.next())
             {
@@ -183,17 +165,17 @@ public class FilterManager extends DataManager implements GenericFilterManager
             return count;
         });
     }
-    
+
     private void invalidateCache(Guild guild)
     {
         invalidateCache(guild.getIdLong());
     }
-    
+
     private void invalidateCache(long guildId)
     {
         cache.pull(guildId);
     }
-    
+
     private String shortnameOf(String name)
     {
         return name.toLowerCase().replaceAll("[^a-z0-9]", "");

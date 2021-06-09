@@ -21,6 +21,7 @@ import com.jagrosh.vortex.Action;
 import com.jagrosh.vortex.Constants;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.automod.Filter;
+import com.jagrosh.vortex.database.managers.GenericFilterManager;
 import com.jagrosh.vortex.database.managers.PremiumManager;
 import com.jagrosh.vortex.utils.FormatUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,15 +34,20 @@ import net.dv8tion.jda.api.entities.MessageEmbed.Field;
  */
 public class FilterCmd extends Command
 {
-    private final Vortex vortex;
-    
+    protected final Vortex vortex;
+
     public FilterCmd(Vortex vortex)
+    {
+        this(vortex, "filter", "filters");
+    }
+    
+    protected FilterCmd(Vortex vortex, String name, String... aliases)
     {
         this.vortex = vortex;
         this.guildOnly = true;
-        this.name = "filter";
+        this.name = name;
         this.category = new Category("AutoMod");
-        this.aliases = new String[]{"filters"};
+        this.aliases = aliases;
         this.arguments = "<create | remove> [arguments...]";
         this.help = "modifies the word filter";
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
@@ -112,7 +118,7 @@ public class FilterCmd extends Command
             try
             {
                 Filter filter = Filter.parseFilter(parts[0], strikes, parts[2]);
-                if(vortex.getDatabase().filters.addFilter(event.getGuild(), filter))
+                if(getFilterManager().addFilter(event.getGuild(), filter))
                 {
                     event.replySuccess(FormatUtil.filterEveryone("Filter *" + filter.name + "* (`" + filter.strikes + " " + Action.STRIKE.getEmoji() 
                             + "`) successfully created with filtered terms:\n" + filter.printContentEscaped()));
@@ -151,7 +157,7 @@ public class FilterCmd extends Command
                 return;
             }
             
-            Filter filter = vortex.getDatabase().filters.deleteFilter(event.getGuild(), event.getArgs());
+            Filter filter = getFilterManager().deleteFilter(event.getGuild(), event.getArgs());
             if(filter == null)
             {
                 event.replyError(FormatUtil.filterEveryone("Filter `" + event.getArgs() + "` could not be found"));
@@ -179,7 +185,7 @@ public class FilterCmd extends Command
         @Override
         protected void execute(CommandEvent event)
         {
-            Field field = vortex.getDatabase().filters.getFiltersDisplay(event.getGuild());
+            Field field = getFilterManager().getFiltersDisplay(event.getGuild());
             if(field == null)
             {
                 event.replyWarning(FormatUtil.filterEveryone("There are no filters for **" + event.getGuild().getName() + "**"));
@@ -191,5 +197,10 @@ public class FilterCmd extends Command
                     .addField(field)
                     .build());
         }
+    }
+
+    protected GenericFilterManager getFilterManager()
+    {
+        return vortex.getDatabase().filters;
     }
 }

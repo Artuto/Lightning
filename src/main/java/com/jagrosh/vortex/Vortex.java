@@ -37,6 +37,7 @@ import com.jagrosh.vortex.commands.automod.MaxlinesCmd;
 import com.jagrosh.vortex.commands.automod.MaxmentionsCmd;
 import com.jagrosh.vortex.commands.automod.ResolvelinksCmd;
 import com.jagrosh.vortex.commands.automod.UnignoreCmd;
+import xyz.rc24.vortiix.commands.automod.UsernameFilterCmd;
 import com.jagrosh.vortex.commands.general.RoleinfoCmd;
 import com.jagrosh.vortex.commands.general.ServerinfoCmd;
 import com.jagrosh.vortex.commands.general.UserinfoCmd;
@@ -205,6 +206,7 @@ public class Vortex
                             new AutoraidmodeCmd(this),
                             new IgnoreCmd(this),
                             new UnignoreCmd(this),
+                            new UsernameFilterCmd(this),
                             
                             // Tools
                             new AnnounceCmd(),

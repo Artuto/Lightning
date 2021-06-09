@@ -189,6 +189,31 @@ public class AutoMod
         }
         else
         {
+            // username filters - start
+            List<Filter> filters = vortex.getDatabase().usernameFilters.getFilters(event.getGuild());
+            int strikeTotal = 0;
+            StringBuilder reason = new StringBuilder();
+
+            if(!filters.isEmpty())
+            {
+                Filter mostStrikesFilter = null;
+                for(Filter filter: filters)
+                    if((mostStrikesFilter == null || filter.strikes > mostStrikesFilter.strikes) && filter.test(event.getUser().getName()))
+                        mostStrikesFilter = filter;
+                if(mostStrikesFilter != null)
+                {
+                    strikeTotal += mostStrikesFilter.strikes;
+                    reason.append(", '").append(mostStrikesFilter.name).append("' Filter");
+                }
+            }
+
+            if(strikeTotal>0)
+            {
+                vortex.getStrikeHandler().applyStrikes(event.getGuild().getSelfMember(),
+                        OffsetDateTime.now(), event.getUser(), strikeTotal, reason.substring(2));
+                return;
+            }
+            // username filters - end
             if(vortex.getDatabase().tempmutes.isMuted(event.getMember()))
             {
                 try
