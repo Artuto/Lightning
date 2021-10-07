@@ -49,6 +49,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -323,7 +324,7 @@ public class BasicLogger
         TextChannel tc = vortex.getDatabase().settings.getSettings(event.getGuild()).getVoiceLogChannel(event.getGuild());
         if(tc==null)
             return;
-        log(OffsetDateTime.now(), tc, "<:voicejoin:314044543605407757>", FormatUtil.formatFullUser(event.getMember().getUser())
+        log(OffsetDateTime.now(), tc, "<:voicejoin:753743582245945404>", FormatUtil.formatFullUser(event.getMember().getUser())
                 +" has joined voice channel _"+event.getChannelJoined().getName()+"_", null);
     }
     
@@ -332,7 +333,7 @@ public class BasicLogger
         TextChannel tc = vortex.getDatabase().settings.getSettings(event.getGuild()).getVoiceLogChannel(event.getGuild());
         if(tc==null)
             return;
-        log(OffsetDateTime.now(), tc, "<:voicechange:314043907992190987>", FormatUtil.formatFullUser(event.getMember().getUser())
+        log(OffsetDateTime.now(), tc, "<:voicemove:753743618434400280>", FormatUtil.formatFullUser(event.getMember().getUser())
                 +" has moved voice channels from _"+event.getChannelLeft().getName()+"_ to _"+event.getChannelJoined().getName()+"_", null);
     }
     
@@ -341,7 +342,7 @@ public class BasicLogger
         TextChannel tc = vortex.getDatabase().settings.getSettings(event.getGuild()).getVoiceLogChannel(event.getGuild());
         if(tc==null)
             return;
-        log(OffsetDateTime.now(), tc, "<:voiceleave:314044543609864193>", FormatUtil.formatFullUser(event.getMember().getUser())
+        log(OffsetDateTime.now(), tc, "<:voiceleave:753743548859416667>", FormatUtil.formatFullUser(event.getMember().getUser())
                 +" has left voice channel _"+event.getChannelLeft().getName()+"_", null);
     }
     
@@ -352,7 +353,7 @@ public class BasicLogger
     {
         List<TextChannel> logs = event.getUser().getMutualGuilds().stream()
             .map(guild -> vortex.getDatabase().settings.getSettings(guild).getAvatarLogChannel(guild))
-            .filter(tc -> tc!=null)
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
         if(logs.isEmpty())
             return;
