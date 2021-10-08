@@ -139,7 +139,7 @@ public class PunishmentCmd extends Command
         event.reply(new MessageBuilder()
                 .append(event.getClient().getSuccess())
                 .append(" ").append(FormatUtil.filterEveryone(successMessage))
-                .setEmbed(new EmbedBuilder().setColor(event.getSelfMember().getColor())
+                .setEmbeds(new EmbedBuilder().setColor(event.getSelfMember().getColor())
                         .addField(vortex.getDatabase().actions.getAllPunishmentsDisplay(event.getGuild()))
                         .build())
                 .build());

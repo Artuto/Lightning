@@ -94,7 +94,7 @@ public class BasicLogger
             usage.increment(tc.getGuild().getIdLong());
             tc.sendMessage(new MessageBuilder()
                 .append(FormatUtil.filterEveryone(LogUtil.basiclogFormat(now, vortex.getDatabase().settings.getSettings(tc.getGuild()).getTimezone(), emote, message)))
-                .setEmbed(embed)
+                .setEmbeds(embed)
                 .build()).queue();
         }
         catch(PermissionException ignore) {}

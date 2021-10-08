@@ -120,7 +120,7 @@ public class UserinfoCmd extends Command
         
         event.reply(new MessageBuilder()
                 .append(FormatUtil.filterEveryone(title))
-                .setEmbed(new EmbedBuilder()
+                .setEmbeds(new EmbedBuilder()
                         .setDescription(str)
                         .setThumbnail(user.getEffectiveAvatarUrl())
                         .setColor(member.getColor()).build())

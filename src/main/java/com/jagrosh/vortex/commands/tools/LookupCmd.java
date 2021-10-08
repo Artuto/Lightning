@@ -131,7 +131,7 @@ public class LookupCmd extends Command
             str+= " <:nitro:314068430611415041>";
         str += "\n" + LINESTART + "Account Creation: **" + TimeUtil.getDateTimeString(u.getTimeCreated()) + "**";
         eb.setDescription(str);
-        event.reply(new MessageBuilder().append(FormatUtil.filterEveryone(text)).setEmbed(eb.build()).build());
+        event.reply(new MessageBuilder().append(FormatUtil.filterEveryone(text)).setEmbeds(eb.build()).build());
         return true;
     }
     
@@ -223,6 +223,6 @@ public class LookupCmd extends Command
                     + "\n" + LINESTART + "Inviter: " + (invite.getInviter() == null ? "N/A" : FormatUtil.formatFullUser(invite.getInviter()))
                     + (invite.getGuild().getSplashId() == null ? "" : "\n" + LINESTART + "Splash: "), false);
         }
-        return new MessageBuilder().append(FormatUtil.filterEveryone(text)).setEmbed(eb.build()).build();
+        return new MessageBuilder().append(FormatUtil.filterEveryone(text)).setEmbeds(eb.build()).build();
     }
 }

@@ -18,12 +18,13 @@ package com.jagrosh.vortex.commands.general;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.vortex.utils.FormatUtil;
-import java.time.format.DateTimeFormatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -33,7 +34,7 @@ public class ServerinfoCmd extends Command
 {
     private final static String LINESTART = "\u25AB"; // ▫
     private final static String GUILD_EMOJI = "\uD83D\uDDA5"; // 🖥
-    private final static String NO_REGION = "\u2754"; // ❔
+    //private final static String NO_REGION = "\u2754"; // ❔
     
     public ServerinfoCmd()
     {
@@ -66,7 +67,7 @@ public class ServerinfoCmd extends Command
         }
         String str = LINESTART+"ID: **"+guild.getId()+"**\n"
                 +LINESTART+"Owner: "+FormatUtil.formatUser(guild.getOwner().getUser())+"\n"
-                +LINESTART+"Location: "+(guild.getRegion().getEmoji()==null ? NO_REGION : guild.getRegion().getEmoji())+" **"+guild.getRegion().getName()+"**\n"
+                /*+LINESTART+"Location: "+(guild.getRegion().getEmoji()==null ? NO_REGION : guild.getRegion().getEmoji())+" **"+guild.getRegion().getName()+"**\n"*/
                 +LINESTART+"Creation: **"+guild.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME)+"**\n"
                 +LINESTART+"Users: **"+guild.getMemberCache().size()+"** ("+onlineCount+" online, "+botCount+" bots)\n"
                 +LINESTART+"Channels: **"+guild.getTextChannelCache().size()+"** Text, **"+guild.getVoiceChannelCache().size()+"** Voice, **"+guild.getCategoryCache().size()+"** Categories\n"
@@ -82,6 +83,6 @@ public class ServerinfoCmd extends Command
             builder.setThumbnail(guild.getIconUrl());
         builder.setColor(guild.getOwner().getColor());
         builder.setDescription(str);
-        event.reply(new MessageBuilder().append(title).setEmbed(builder.build()).build());
+        event.reply(new MessageBuilder().append(title).setEmbeds(builder.build()).build());
     }
 }

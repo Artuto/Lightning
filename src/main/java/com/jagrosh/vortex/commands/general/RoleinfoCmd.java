@@ -92,7 +92,7 @@ public class RoleinfoCmd extends Command
         
         event.reply(new MessageBuilder()
                 .append(FormatUtil.filterEveryone(title))
-                .setEmbed(new EmbedBuilder()
+                .setEmbeds(new EmbedBuilder()
                         .setDescription(desr.toString().trim())
                         .setColor(role.getColor()).build())
                 .build());

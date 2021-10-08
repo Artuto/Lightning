@@ -314,7 +314,7 @@ public class FormatUtil {
         builder.addField("Important :warning:", "This is not the official Vortex instance, please" +
                 " do not seek support for this bot in the official support guild!", false);
         
-        return new MessageBuilder().append(filterEveryone(content)).setEmbed(builder.build()).build();
+        return new MessageBuilder().append(filterEveryone(content)).setEmbeds(builder.build()).build();
     }
     
     public static String helpLinks(CommandEvent event)

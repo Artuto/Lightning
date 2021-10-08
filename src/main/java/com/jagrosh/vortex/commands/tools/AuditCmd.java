@@ -176,7 +176,7 @@ public class AuditCmd extends Command
             });
             event.reply(new MessageBuilder()
                     .setContent(event.getClient().getSuccess()+" Recent Audit Logs in **"+FormatUtil.filterEveryone(event.getGuild().getName())+"**:")
-                    .setEmbed(eb.build()).build());
+                    .setEmbeds(eb.build()).build());
         }, f -> event.replyWarning("Failed to retrieve audit logs"));
     }
     

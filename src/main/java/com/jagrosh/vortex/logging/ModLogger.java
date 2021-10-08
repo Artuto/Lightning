@@ -85,7 +85,7 @@ public class ModLogger
             }
             if(!toUpdate.isEmpty())
             {
-                LOG.debug("DEBUG Modlog updating " + toUpdate.size() + " guilds: " + toUpdate.toString());
+                LOG.debug("DEBUG Modlog updating " + toUpdate.size() + " guilds: " + toUpdate);
                 try
                 {
                     long time, diff;
@@ -154,7 +154,7 @@ public class ModLogger
             try
             {
                 modlog.sendMessage(new MessageBuilder()
-                        .setEmbed(embed)
+                        .setEmbeds(embed)
                         .append(FormatUtil.filterEveryone(LogUtil.modlogCleanFormat(now, 
                                 Objects.requireNonNull(vortex.getDatabase().settings.getSettings(moderator.getGuild())).getTimezone(),
                                 i, moderator.getUser(), numMessages, target, criteria, reason)))
