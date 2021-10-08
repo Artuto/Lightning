@@ -17,7 +17,7 @@ package com.jagrosh.vortex.commands.general;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.vortex.Constants;
+import net.dv8tion.jda.api.Permission;
 
 /**
  *
@@ -30,14 +30,16 @@ public class InviteCmd extends Command
         this.name = "invite";
         this.help = "invite the bot";
         this.guildOnly = false;
+        this.ownerCommand = true;
     }
     
     @Override
     protected void execute(CommandEvent event) 
     {
-        event.reply("Hello. I am **"+event.getJDA().getSelfUser().getName()+"**, a simple moderation bot built by **jagrosh**#4824."
+        String invite = event.getJDA().getInviteUrl(Permission.ADMINISTRATOR);
+        event.reply("Hello. I am **"+event.getJDA().getSelfUser().getName()+"**, a simple moderation bot."/*built by **jagrosh**#4824."*/
                 + "\nYou can find out how to add me to your server with the link below:"
-                + "\n\n\uD83D\uDD17 **<"+Constants.Wiki.START+">**" // 🔗
-                + "\n\nFor assistance, check out the wiki: <"+Constants.Wiki.WIKI_BASE+">");
+                + "\n\n\uD83D\uDD17 **<"+invite+">**" // 🔗
+                /*+ "\n\nFor assistance, check out the wiki: <"+Constants.Wiki.WIKI_BASE+">"*/);
     }
 }

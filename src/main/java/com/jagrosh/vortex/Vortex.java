@@ -37,6 +37,7 @@ import com.jagrosh.vortex.commands.automod.MaxlinesCmd;
 import com.jagrosh.vortex.commands.automod.MaxmentionsCmd;
 import com.jagrosh.vortex.commands.automod.ResolvelinksCmd;
 import com.jagrosh.vortex.commands.automod.UnignoreCmd;
+import com.jagrosh.vortex.commands.general.InviteCmd;
 import com.jagrosh.vortex.commands.general.RoleinfoCmd;
 import com.jagrosh.vortex.commands.general.ServerinfoCmd;
 import com.jagrosh.vortex.commands.general.UserinfoCmd;
@@ -153,7 +154,7 @@ public class Vortex
                         .addCommands(
                             // General
                             //new AboutCmd(),
-                            //new InviteCmd(),
+                            new InviteCmd(),
                             new PingCommand(),
                             new RoleinfoCmd(),
                             new ServerinfoCmd(),
