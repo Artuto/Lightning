@@ -48,8 +48,10 @@ import java.net.URL;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -86,15 +88,20 @@ public class BasicLogger
     {
         return usage;
     }
-    
+
     private void log(OffsetDateTime now, TextChannel tc, String emote, String message, MessageEmbed embed)
+    {
+        logEmbeds(now, tc, emote, message, embed == null ? Collections.emptySet() : Set.of(embed));
+    }
+    
+    private void logEmbeds(OffsetDateTime now, TextChannel tc, String emote, String message, Set<MessageEmbed> embeds)
     {
         try
         {
             usage.increment(tc.getGuild().getIdLong());
             tc.sendMessage(new MessageBuilder()
                 .append(FormatUtil.filterEveryone(LogUtil.basiclogFormat(now, vortex.getDatabase().settings.getSettings(tc.getGuild()).getTimezone(), emote, message)))
-                .setEmbeds(embed)
+                .setEmbeds(embeds)
                 .build()).queue();
         }
         catch(PermissionException ignore) {}
