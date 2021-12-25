@@ -89,6 +89,7 @@ import com.typesafe.config.ConfigFactory;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -98,6 +99,7 @@ import xyz.rc24.vortiix.Vortiix;
 import xyz.rc24.vortiix.commands.automod.UsernameFilterCmd;
 import xyz.rc24.vortiix.commands.moderation.CloseThreadCmd;
 import xyz.rc24.vortiix.commands.moderation.ModReplyCmd;
+import xyz.rc24.vortiix.commands.moderation.RoleCmd;
 import xyz.rc24.vortiix.commands.other.MakeAClownCmd;
 
 import java.util.concurrent.Executors;
@@ -178,6 +180,7 @@ public class Vortex
                             new ReasonCmd(this),
                             new ModReplyCmd(this),
                             new CloseThreadCmd(this),
+                            new RoleCmd(),
 
                             // Settings
                             new SetupCmd(this),
@@ -324,6 +327,7 @@ public class Vortex
      */
     public static void main(String[] args) throws Exception
     {
+        Class.forName(Permission.class.getCanonicalName());
         new Vortex();
     }
 }
