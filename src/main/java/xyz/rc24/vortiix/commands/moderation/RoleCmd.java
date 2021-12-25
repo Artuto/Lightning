@@ -131,7 +131,7 @@ public class RoleCmd extends Command
         @Override
         protected void execute(CommandEvent event)
         {
-            String[] parts = event.getArgs().split("to", 2);
+            String[] parts = event.getArgs().split("from", 2);
             if(parts.length < 2)
             {
                 event.reactError();
