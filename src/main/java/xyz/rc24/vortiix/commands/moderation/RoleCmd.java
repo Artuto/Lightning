@@ -45,7 +45,7 @@ public class RoleCmd extends Command
         @Override
         protected void execute(CommandEvent event)
         {
-            String[] parts = event.getArgs().split("\\s+", 2);
+            String[] parts = event.getArgs().split("to", 2);
             if(parts.length < 2)
             {
                 event.reactError();
@@ -53,7 +53,7 @@ public class RoleCmd extends Command
             }
 
             Role role;
-            List<Role> found = FinderUtil.findRoles(parts[0], event.getGuild());
+            List<Role> found = FinderUtil.findRoles(parts[0].trim(), event.getGuild());
             if(found.isEmpty())
             {
                 event.replyError("I couldn't find the role you were looking for!");
@@ -68,7 +68,7 @@ public class RoleCmd extends Command
                 role = found.get(0);
 
             Member member;
-            List<Member> mFound = FinderUtil.findMembers(parts[1], event.getGuild());
+            List<Member> mFound = FinderUtil.findMembers(parts[1].trim(), event.getGuild());
             if(mFound.isEmpty())
             {
                 event.replyError("I couldn't find the member you were looking for!");
@@ -131,7 +131,7 @@ public class RoleCmd extends Command
         @Override
         protected void execute(CommandEvent event)
         {
-            String[] parts = event.getArgs().split("\\s+", 2);
+            String[] parts = event.getArgs().split("to", 2);
             if(parts.length < 2)
             {
                 event.reactError();
@@ -139,7 +139,7 @@ public class RoleCmd extends Command
             }
 
             Role role;
-            List<Role> found = FinderUtil.findRoles(parts[0], event.getGuild());
+            List<Role> found = FinderUtil.findRoles(parts[0].trim(), event.getGuild());
             if(found.isEmpty())
             {
                 event.replyError("I couldn't find the role you were looking for!");
@@ -154,7 +154,7 @@ public class RoleCmd extends Command
                 role = found.get(0);
 
             Member member;
-            List<Member> mFound = FinderUtil.findMembers(parts[1], event.getGuild());
+            List<Member> mFound = FinderUtil.findMembers(parts[1].trim(), event.getGuild());
             if(mFound.isEmpty())
             {
                 event.replyError("I couldn't find the member you were looking for!");
