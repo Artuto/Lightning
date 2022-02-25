@@ -73,6 +73,7 @@ public class BasicLogger
     private final static String NEW = "\uD83C\uDD95"; // 🆕
     private final static String LEAVE = "\uD83D\uDCE4"; // 📤
     private final static String AVATAR = "\uD83D\uDDBC"; // 🖼
+    private final static String PHISH = "\u2622"; // ☢
     
     private final Vortex vortex;
     private final AvatarSaver avatarSaver;
@@ -258,6 +259,17 @@ public class BasicLogger
         log(OffsetDateTime.now(), tc, REDIRECT, 
                 FormatUtil.formatFullUser(message.getAuthor())+"'s message in "+message.getTextChannel().getAsMention()+" contained redirects:", 
                 new EmbedBuilder().setColor(Color.BLUE.brighter().brighter()).appendDescription(sb.toString()).build());
+    }
+
+    public void logPhishLink(Message message, String link)
+    {
+        TextChannel tc = vortex.getDatabase().settings.getSettings(message.getGuild()).getMessageLogChannel(message.getGuild());
+        if(tc==null)
+            return;
+        log(OffsetDateTime.now(), tc, PHISH,
+                FormatUtil.formatFullUser(message.getAuthor())+"'s message in "+message.getTextChannel().getAsMention()+" contained a phishing/scam link:",
+                new EmbedBuilder().setColor(Color.BLUE.brighter().brighter()).appendDescription("`" + link + "`")
+                        .setFooter("Source: phisherman.gg").build());
     }
     
     

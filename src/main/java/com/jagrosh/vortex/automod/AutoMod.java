@@ -36,7 +36,10 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.rc24.vortiix.automod.PhishURLResolver;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -64,6 +67,10 @@ public class AutoMod
     
     private static final Pattern LINK       = Pattern.compile("https?:\\/\\/\\S+", Pattern.CASE_INSENSITIVE);
     private static final String INVITE_LINK = "https?:\\/\\/discord(?:app\\.com\\/invite|\\.gg)\\/(\\S+)";
+
+    private static final String REAL_LINK  = "https?://\\S+";
+    private static final String PLAIN_LINK = "(?!https?://)\\S+\\.\\S+";
+    private static final Pattern URL       = Pattern.compile("(" + REAL_LINK + "|" + PLAIN_LINK + ")", Pattern.CASE_INSENSITIVE);
     
     private static final String CONDENSER = "(.+?)\\s*(\\1\\s*)+";
     private static final Logger LOG = LoggerFactory.getLogger("AutoMod");
@@ -78,6 +85,7 @@ public class AutoMod
     private final FixedCache<String,DupeStatus> spams = new FixedCache<>(3000);
     private final HashMap<Long,OffsetDateTime> latestGuildJoin = new HashMap<>();
     private final Usage usage = new Usage();
+    private final PhishURLResolver phishUrlResolver = new PhishURLResolver();
     
     public AutoMod(Vortex bot, Config config)
     {
@@ -497,9 +505,57 @@ public class AutoMod
             vortex.getStrikeHandler().applyStrikes(message.getGuild().getSelfMember(), 
                     latestTime(message), message.getAuthor(), strikeTotal, reason.toString().substring(2));
         }
-        
+
+        // Vortiix - prevent scam/phishing links
+        if(settings.phishStrikes > 0)
+        {
+            List<String> links = new ArrayList<>();
+            List<String> hosts = new ArrayList<>();
+            Matcher m = URL.matcher(message.getContentRaw());
+            while(m.find())
+            {
+                String link = m.group();
+                if(link.startsWith("<"))
+                    link = link.substring(1);
+                if(link.endsWith(">"))
+                    link = link.substring(0, link.length() - 1);
+                if(!link.startsWith("https://") && !link.startsWith("http://"))
+                    link = "http://" + link;
+
+                try
+                {
+                    java.net.URL parsedUrl = new URL(link);
+                    links.add(link);
+                    hosts.add(parsedUrl.getHost());
+                }
+                catch(MalformedURLException ignored) {}
+            }
+
+            if(!hosts.isEmpty())
+                vortex.getThreadpool().execute(() ->
+                {
+                    for(int i = 0; i < hosts.size(); i++)
+                    {
+                        String link = links.get(i);
+                        String host = hosts.get(i);
+
+                        if(phishUrlResolver.isPhishUrl(host))
+                        {
+                            vortex.getBasicLogger().logPhishLink(message, link);
+
+                            try {message.delete().reason("Automod").queue(v->{}, f->{});}
+                            catch(PermissionException ignored) {}
+
+                            vortex.getStrikeHandler().applyStrikes(message.getGuild().getSelfMember(),
+                                    latestTime(message), message.getAuthor(), settings.phishStrikes, "Phishing/Scam link");
+                            return;
+                        }
+                    }
+                });
+        }
+
         // now, lets resolve links, but async
-        if(!shouldDelete && settings.resolveUrls && (preventInvites || settings.refStrikes>0))
+        /*if(!shouldDelete && settings.resolveUrls && (preventInvites || settings.refStrikes>0))
         {
             List<String> links = new LinkedList<>();
             Matcher m = LINK.matcher(message.getContentRaw());
@@ -548,7 +604,7 @@ public class AutoMod
                             latestTime(message), message.getAuthor(), rstrikeTotal, rreason);
                     }
                 });
-        }
+        }*/
     }
     
     private void purgeMessages(Guild guild, Predicate<CachedMessage> predicate)

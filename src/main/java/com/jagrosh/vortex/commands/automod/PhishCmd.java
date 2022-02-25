@@ -17,29 +17,29 @@ package com.jagrosh.vortex.commands.automod;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.Permission;
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.database.managers.AutomodManager;
 import com.jagrosh.vortex.database.managers.PunishmentManager;
 import com.jagrosh.vortex.utils.FormatUtil;
+import net.dv8tion.jda.api.Permission;
 
 /**
  *
  * @author John Grosh (john.a.grosh@gmail.com)
  */
-public class AntirefCmd extends Command
+public class PhishCmd extends Command
 {
     private final Vortex vortex;
-    
-    public AntirefCmd(Vortex vortex)
+
+    public PhishCmd(Vortex vortex)
     {
         this.vortex = vortex;
-        this.name = "antireferral";
+        this.name = "phish";
         this.guildOnly = true;
-        this.aliases = new String[]{"antiref","antirefferal","antirefferral","anti-ref","anti-referral"};
+        this.aliases = new String[]{"antiphish","phishing","antiphishing"};
         this.category = new Category("AutoMod");
         this.arguments = "<strikes>";
-        this.help = "sets strikes for posting referral links";
+        this.help = "sets strikes for posting malicious links";
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }
 
@@ -71,8 +71,8 @@ public class AntirefCmd extends Command
             event.replyError("The number of strikes must be between 0 and "+AutomodManager.MAX_STRIKES);
             return;
         }
-        vortex.getDatabase().automod.setRefStrikes(event.getGuild(), numstrikes);
+        vortex.getDatabase().automod.setPhishStrikes(event.getGuild(), numstrikes);
         boolean also = vortex.getDatabase().actions.useDefaultSettings(event.getGuild());
-        event.replySuccess("Users will now receive `"+numstrikes+"` strikes for posting referral links."+(also ? PunishmentManager.DEFAULT_SETUP_MESSAGE : ""));
+        event.replySuccess("Users will now receive `"+numstrikes+"` strikes for posting malicious links."+(also ? PunishmentManager.DEFAULT_SETUP_MESSAGE : ""));
     }
 }

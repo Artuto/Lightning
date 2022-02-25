@@ -57,6 +57,7 @@ public class AutomodManager extends DataManager
     public final static SQLColumn<Integer> REF_STRIKES = new IntegerColumn("REF_STRIKES", false, 0);
     public final static SQLColumn<Integer> COPYPASTA_STRIKES = new IntegerColumn("COPYPASTA_STRIKES", false, 0);
     public final static SQLColumn<Integer> EVERYONE_STRIKES = new IntegerColumn("EVERYONE_STRIKES", false, 0);
+    public final static SQLColumn<Integer> PHISH_STRIKES = new IntegerColumn("PHISH_STRIKES", false, 0);
     
     public final static SQLColumn<Integer> DUPE_STRIKES = new IntegerColumn("DUPE_STRIKES", false, 0);
     public final static SQLColumn<Integer> DUPE_DELETE_THRESH = new IntegerColumn("DUPE_DELETE_THRESH", false, 0);
@@ -111,8 +112,9 @@ public class AutomodManager extends DataManager
                         ? "`" + settings.raidmodeNumber + "` joins/`" + settings.raidmodeTime + "`s\n" 
                         : "Disabled\n")
                     + "Auto Dehoist: " + (settings.dehoistChar==(char)0 
-                        ? "Disabled" 
-                        : "`"+settings.dehoistChar+"` and above")
+                        ? "Disabled\n"
+                        : "`"+settings.dehoistChar+"` and above\n")
+                    + "Phishing/Scam Strikes: " + settings.phishStrikes
                 /*+ "\u200B"*/, true);
     }
     
@@ -133,7 +135,8 @@ public class AutomodManager extends DataManager
                 .put("raidmodeNumber", settings.raidmodeNumber)
                 .put("raidmodeTime", settings.raidmodeTime)
                 .put("refStrikes", settings.refStrikes)
-                .put("resolveUrls", settings.resolveUrls);
+                .put("resolveUrls", settings.resolveUrls)
+                .put("phishStrikes", settings.phishStrikes);
     }
 
     public void setSettingsJson(Guild guild, JSONObject json)
@@ -153,6 +156,7 @@ public class AutomodManager extends DataManager
         setAutoRaidMode(guild, json.getInt("raidmodeNumber"), json.getInt("raidmodeTime"));
         setRefStrikes(guild, json.getInt("refStrikes"));
         setResolveUrls(guild, json.getBoolean("resolveUrls"));
+        setPhishStrikes(guild, json.getInt("phishStrikes"));
     }
     
     public boolean hasSettings(Guild guild)
@@ -405,6 +409,26 @@ public class AutomodManager extends DataManager
             }
         });
     }
+
+    public void setPhishStrikes(Guild guild, int strikes)
+    {
+        invalidateCache(guild);
+        readWrite(selectAll(GUILD_ID.is(guild.getIdLong())), rs ->
+        {
+            if(rs.next())
+            {
+                PHISH_STRIKES.updateValue(rs, strikes);
+                rs.updateRow();
+            }
+            else
+            {
+                rs.moveToInsertRow();
+                GUILD_ID.updateValue(rs, guild.getIdLong());
+                PHISH_STRIKES.updateValue(rs, strikes);
+                rs.insertRow();
+            }
+        });
+    }
     
     private void invalidateCache(Guild guild)
     {
@@ -422,7 +446,7 @@ public class AutomodManager extends DataManager
         public final int maxMentions, maxRoleMentions;
         public final int maxLines;
         public final int raidmodeNumber, raidmodeTime;
-        public final int inviteStrikes, refStrikes, copypastaStrikes, everyoneStrikes;
+        public final int inviteStrikes, refStrikes, copypastaStrikes, everyoneStrikes, phishStrikes;
         public final int dupeStrikes, dupeDeleteThresh, dupeStrikeThresh;
         public final char dehoistChar;
         
@@ -438,6 +462,7 @@ public class AutomodManager extends DataManager
             this.refStrikes = 0;
             this.copypastaStrikes = 0;
             this.everyoneStrikes = 0;
+            this.phishStrikes = 0;
             this.dupeStrikes = 0;
             this.dupeDeleteThresh = 0;
             this.dupeStrikeThresh = 0;
@@ -456,6 +481,7 @@ public class AutomodManager extends DataManager
             this.refStrikes = REF_STRIKES.getValue(rs);
             this.copypastaStrikes = COPYPASTA_STRIKES.getValue(rs);
             this.everyoneStrikes = EVERYONE_STRIKES.getValue(rs);
+            this.phishStrikes = PHISH_STRIKES.getValue(rs);
             this.dupeStrikes = DUPE_STRIKES.getValue(rs);
             this.dupeDeleteThresh = DUPE_DELETE_THRESH.getValue(rs);
             this.dupeStrikeThresh = DUPE_STRIKE_THRESH.getValue(rs);

@@ -35,6 +35,7 @@ import com.jagrosh.vortex.commands.automod.FilterCmd;
 import com.jagrosh.vortex.commands.automod.IgnoreCmd;
 import com.jagrosh.vortex.commands.automod.MaxlinesCmd;
 import com.jagrosh.vortex.commands.automod.MaxmentionsCmd;
+import com.jagrosh.vortex.commands.automod.PhishCmd;
 import com.jagrosh.vortex.commands.automod.ResolvelinksCmd;
 import com.jagrosh.vortex.commands.automod.UnignoreCmd;
 import com.jagrosh.vortex.commands.general.InviteCmd;
@@ -205,6 +206,7 @@ public class Vortex
                             new AntiduplicateCmd(this),
                             new AutodehoistCmd(this),
                             new FilterCmd(this),
+                            new PhishCmd(this),
                             new ResolvelinksCmd(this),
                             new AutoraidmodeCmd(this),
                             new IgnoreCmd(this),
