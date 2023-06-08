@@ -1,4 +1,4 @@
-package xyz.rc24.vortiix.commands.other;
+package xyz.artuto.lightning.commands.other;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

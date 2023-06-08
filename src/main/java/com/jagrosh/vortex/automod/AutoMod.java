@@ -36,7 +36,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.rc24.vortiix.automod.PhishURLResolver;
+import xyz.artuto.lightning.automod.PhishURLResolver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,7 +45,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -506,7 +505,7 @@ public class AutoMod
                     latestTime(message), message.getAuthor(), strikeTotal, reason.toString().substring(2));
         }
 
-        // Vortiix - prevent scam/phishing links
+        // Lightning - prevent scam/phishing links
         if(settings.phishStrikes > 0)
         {
             List<String> links = new ArrayList<>();

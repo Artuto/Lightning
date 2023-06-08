@@ -1,4 +1,4 @@
-package xyz.rc24.vortiix.commands.moderation;
+package xyz.artuto.lightning.commands.moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

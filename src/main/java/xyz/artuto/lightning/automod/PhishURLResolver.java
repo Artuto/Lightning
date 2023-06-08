@@ -1,4 +1,4 @@
-package xyz.rc24.vortiix.automod;
+package xyz.artuto.lightning.automod;
 
 import com.jagrosh.vortex.utils.FixedCache;
 import okhttp3.OkHttpClient;
@@ -65,7 +65,7 @@ public class PhishURLResolver
     {
         return new Request.Builder()
                 .url("https://api.phisherman.gg/v1/domains/" + url)
-                .addHeader("User-Agent", "Vortiix (+https://github.com/RiiConnect24-Bot/Vortiix / 264499432538505217)")
+                .addHeader("User-Agent", "Lightning (+https://github.com/Artuto/Lightning / 264499432538505217)")
                 .build();
     }
 }

@@ -17,7 +17,7 @@ package com.jagrosh.vortex.database;
 
 import com.jagrosh.easysql.DatabaseConnector;
 import com.jagrosh.vortex.database.managers.*;
-import xyz.rc24.vortiix.database.managers.UsernameFilterManager;
+import xyz.artuto.lightning.database.managers.UsernameFilterManager;
 
 /**
  *

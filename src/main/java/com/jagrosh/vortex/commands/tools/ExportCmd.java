@@ -61,6 +61,6 @@ public class ExportCmd extends Command
                 .put("filters", db.filters.getFiltersJson(g))
                 .put("usernameFilters", db.usernameFilters.getFiltersJson(g))
                 .put("premium", db.premium.getPremiumInfoJson(g));
-        event.getChannel().sendFile(obj.toString(1).getBytes(), "vortiix_data_" + g.getId() + ".json").queue();
+        event.getChannel().sendFile(obj.toString(1).getBytes(), "lightning_data_" + g.getId() + ".json").queue();
     }
 }

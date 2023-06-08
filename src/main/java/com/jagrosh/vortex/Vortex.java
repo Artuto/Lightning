@@ -96,12 +96,9 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
-import xyz.rc24.vortiix.Vortiix;
-import xyz.rc24.vortiix.commands.automod.UsernameFilterCmd;
-import xyz.rc24.vortiix.commands.moderation.CloseThreadCmd;
-import xyz.rc24.vortiix.commands.moderation.ModReplyCmd;
-import xyz.rc24.vortiix.commands.moderation.RoleCmd;
-import xyz.rc24.vortiix.commands.other.MakeAClownCmd;
+import xyz.artuto.lightning.commands.automod.UsernameFilterCmd;
+import xyz.artuto.lightning.commands.moderation.RoleCmd;
+import xyz.artuto.lightning.commands.other.MakeAClownCmd;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -125,7 +122,6 @@ public class Vortex
     private final WebhookClient logwebhook;
     private final AutoMod automod;
     private final StrikeHandler strikehandler;
-    private final Vortiix vortiix;
 
     public Vortex() throws Exception
     {
@@ -143,7 +139,6 @@ public class Vortex
         logwebhook = new WebhookClientBuilder(config.getString("webhook-url")).build();
         automod = new AutoMod(this, config);
         strikehandler = new StrikeHandler(this);
-        this.vortiix = new Vortiix(config);
 
         this.client = new CommandClientBuilder()
                         .setPrefix(Constants.PREFIX)
@@ -179,8 +174,6 @@ public class Vortex
                             new PardonCmd(this),
                             new CheckCmd(this),
                             new ReasonCmd(this),
-                            new ModReplyCmd(this),
-                            new CloseThreadCmd(this),
                             new RoleCmd(),
 
                             // Settings
@@ -316,11 +309,6 @@ public class Vortex
     public StrikeHandler getStrikeHandler()
     {
         return strikehandler;
-    }
-
-    public Vortiix getVortiix()
-    {
-        return vortiix;
     }
 
     /**

@@ -1,4 +1,4 @@
-package xyz.rc24.vortiix.database.managers;
+package xyz.artuto.lightning.database.managers;
 
 import com.jagrosh.easysql.DataManager;
 import com.jagrosh.easysql.DatabaseConnector;

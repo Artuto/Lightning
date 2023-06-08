@@ -1,4 +1,4 @@
-package xyz.rc24.vortiix.commands.automod;
+package xyz.artuto.lightning.commands.automod;
 
 import com.jagrosh.vortex.Vortex;
 import com.jagrosh.vortex.commands.automod.FilterCmd;
