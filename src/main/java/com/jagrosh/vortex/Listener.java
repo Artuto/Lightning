@@ -166,14 +166,21 @@ public class Listener implements EventListener
         }
         else if (event instanceof UserUpdateNameEvent)
         {
+            // Make sure the name actually changed
             UserUpdateNameEvent unue = (UserUpdateNameEvent)event;
+            if(unue.getNewName().equals(unue.getOldName()))
+                return;
             // Log the name change
             vortex.getBasicLogger().logNameChange(unue);
             unue.getUser().getMutualGuilds().stream().map(g -> g.getMember(unue.getUser())).filter(Objects::nonNull).forEach(m -> vortex.getAutoMod().dehoist(m));
         }
         else if (event instanceof UserUpdateDiscriminatorEvent)
         {
-            vortex.getBasicLogger().logNameChange((UserUpdateDiscriminatorEvent)event);
+            // Make sure the discrim actually changed
+            UserUpdateDiscriminatorEvent udue = (UserUpdateDiscriminatorEvent)event;
+            if(udue.getNewDiscriminator().equals(udue.getOldDiscriminator()))
+                return;
+            vortex.getBasicLogger().logDiscrimChange(udue);
         }
         else if (event instanceof GuildMemberUpdateNicknameEvent)
         {
